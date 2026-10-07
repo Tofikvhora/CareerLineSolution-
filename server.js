@@ -618,6 +618,60 @@ app.delete('/api/admin/applications/:id', authenticateAdmin, (req, res) => {
   res.json({ success: true, message: 'Application deleted.' });
 });
 
+// Export Applications to CSV/Excel
+app.get('/api/admin/applications/export', authenticateAdmin, (req, res) => {
+  const data = readData();
+  const apps = data.applications || [];
+
+  const headers = [
+    'Application ID',
+    'Candidate Name',
+    'Email',
+    'Phone',
+    'Position Applied',
+    'Experience',
+    'Current Location',
+    'Current CTC',
+    'Expected CTC',
+    'Notice Period',
+    'Skills',
+    'Status',
+    'Recruiter Notes',
+    'Resume Filename',
+    'Resume Download Link',
+    'Applied Date'
+  ];
+
+  const baseUrl = req.protocol + '://' + req.get('host');
+
+  const rows = apps.map(app => {
+    let resumeUrl = app.resumeUrl ? (app.resumeUrl.startsWith('http') ? app.resumeUrl : baseUrl + app.resumeUrl) : 'No File Uploaded';
+    return [
+      app.id || '',
+      app.fullName || '',
+      app.email || '',
+      app.phone || '',
+      app.jobTitle || 'General Application',
+      app.experience || '',
+      app.currentLocation || '',
+      app.currentCTC || '',
+      app.expectedCTC || '',
+      app.noticePeriod || '',
+      Array.isArray(app.skills) ? app.skills.join('; ') : (app.skills || ''),
+      app.status || 'New',
+      app.recruiterNotes || '',
+      app.resumeFileName || '',
+      resumeUrl,
+      app.createdAt ? new Date(app.createdAt).toLocaleString('en-IN') : ''
+    ].map(val => `"${String(val).replace(/"/g, '""')}"`).join(',');
+  });
+
+  const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\r\n');
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="CareerLine_Candidate_Applications_${new Date().toISOString().split('T')[0]}.csv"`);
+  res.send(csvContent);
+});
+
 // Employer Staffing Requests
 app.get('/api/admin/employer-requests', authenticateAdmin, (req, res) => {
   const data = readData();

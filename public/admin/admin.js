@@ -875,3 +875,177 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+
+// ==========================================
+// EXPORT CANDIDATES TO EXCEL (.XLSX)
+// ==========================================
+window.exportCandidatesToExcel = function () {
+  if (!cachedApplications || cachedApplications.length === 0) {
+    showToast('No candidate applications available to export.', 'warning');
+    return;
+  }
+
+  showToast(`Preparing Excel export for ${cachedApplications.length} candidates...`, 'info');
+
+  const rows = cachedApplications.map(app => {
+    let resumeFullUrl = '';
+    if (app.resumeUrl) {
+      if (app.resumeUrl.startsWith('http') || app.resumeUrl.startsWith('data:')) {
+        resumeFullUrl = app.resumeUrl;
+      } else {
+        resumeFullUrl = window.location.origin + (app.resumeUrl.startsWith('/') ? '' : '/') + app.resumeUrl;
+      }
+    }
+
+    return {
+      'Application ID': app.id || '',
+      'Candidate Name': app.fullName || '',
+      'Email Address': app.email || '',
+      'Phone Number': app.phone || '',
+      'Position Applied': app.jobTitle || 'General Application',
+      'Experience': app.experience || '',
+      'Current Location': app.currentLocation || '',
+      'Current CTC': app.currentCTC || '',
+      'Expected CTC': app.expectedCTC || '',
+      'Notice Period': app.noticePeriod || '',
+      'Key Skills': Array.isArray(app.skills) ? app.skills.join(', ') : (app.skills || ''),
+      'Status': app.status || 'New',
+      'Recruiter Notes': app.recruiterNotes || '',
+      'Resume Filename': app.resumeFileName || (app.resumeUrl ? 'resume.pdf' : 'No Resume Uploaded'),
+      'Resume Download Link': resumeFullUrl || 'Not Uploaded',
+      'Applied Date': app.createdAt ? new Date(app.createdAt).toLocaleString('en-IN') : ''
+    };
+  });
+
+  const dateStr = new Date().toISOString().split('T')[0];
+  const filename = `CareerLine_Candidate_Applications_${dateStr}.xlsx`;
+
+  // If SheetJS is available
+  if (typeof XLSX !== 'undefined') {
+    try {
+      const worksheet = XLSX.utils.json_to_sheet(rows);
+
+      // Auto-fit column widths
+      const colWidths = Object.keys(rows[0] || {}).map(key => {
+        let maxLen = key.length;
+        rows.forEach(r => {
+          const valLen = r[key] ? String(r[key]).length : 0;
+          if (valLen > maxLen) maxLen = Math.min(valLen, 45);
+        });
+        return { wch: Math.max(maxLen + 3, 12) };
+      });
+      worksheet['!cols'] = colWidths;
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Candidates & Resumes');
+      XLSX.writeFile(workbook, filename);
+      showToast(`Exported ${rows.length} candidates to Excel successfully!`, 'success');
+      return;
+    } catch (err) {
+      console.warn('XLSX writing error, falling back to CSV:', err);
+    }
+  }
+
+  // Fallback to UTF-8 CSV with BOM for Microsoft Excel
+  exportCandidatesToCsv(rows, `CareerLine_Candidate_Applications_${dateStr}.csv`);
+};
+
+function exportCandidatesToCsv(rows, filename) {
+  if (!rows || rows.length === 0) return;
+  const headers = Object.keys(rows[0]);
+  const csvRows = [];
+  csvRows.push(headers.map(h => `"${h.replace(/"/g, '""')}"`).join(','));
+
+  rows.forEach(row => {
+    const values = headers.map(header => {
+      const val = row[header] === null || row[header] === undefined ? '' : String(row[header]);
+      return `"${val.replace(/"/g, '""')}"`;
+    });
+    csvRows.push(values.join(','));
+  });
+
+  const csvString = '\uFEFF' + csvRows.join('\r\n');
+  const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.setAttribute('download', filename);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  showToast(`Exported ${rows.length} candidates to CSV (Excel compatible)!`, 'success');
+}
+
+// ==========================================
+// BULK DOWNLOAD CANDIDATE RESUMES (.ZIP)
+// ==========================================
+window.downloadAllResumesZip = async function () {
+  if (!cachedApplications || cachedApplications.length === 0) {
+    showToast('No candidate applications available.', 'warning');
+    return;
+  }
+
+  const appsWithResumes = cachedApplications.filter(a => a.resumeUrl);
+  if (appsWithResumes.length === 0) {
+    showToast('None of the candidates in the current list have uploaded resume files.', 'warning');
+    return;
+  }
+
+  if (typeof JSZip === 'undefined') {
+    showToast('ZIP library is loading. You can also download resumes directly using the CV buttons in the table.', 'warning');
+    return;
+  }
+
+  showToast(`Packaging ${appsWithResumes.length} candidate resumes into ZIP archive...`, 'info');
+
+  try {
+    const zip = new JSZip();
+    const folder = zip.folder('CareerLine_Candidate_Resumes');
+
+    let successCount = 0;
+    for (const app of appsWithResumes) {
+      const cleanName = (app.fullName || 'Candidate').replace(/[^a-zA-Z0-9_-]/g, '_');
+      const filename = `${cleanName}_${app.resumeFileName || 'Resume.pdf'}`;
+
+      try {
+        if (app.resumeUrl.startsWith('data:')) {
+          const base64Data = app.resumeUrl.split(',')[1];
+          if (base64Data) {
+            folder.file(filename, base64Data, { base64: true });
+            successCount++;
+          }
+        } else {
+          const resp = await fetch(app.resumeUrl);
+          if (resp.ok) {
+            const blob = await resp.blob();
+            folder.file(filename, blob);
+            successCount++;
+          }
+        }
+      } catch (e) {
+        console.warn('Could not bundle resume for:', app.fullName, e);
+      }
+    }
+
+    if (successCount === 0) {
+      showToast('Could not fetch resumes for ZIP bundling. Please download individual CVs from the table.', 'warning');
+      return;
+    }
+
+    const dateStr = new Date().toISOString().split('T')[0];
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    if (typeof saveAs !== 'undefined') {
+      saveAs(zipBlob, `CareerLine_Candidate_Resumes_${dateStr}.zip`);
+    } else {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(zipBlob);
+      a.download = `CareerLine_Candidate_Resumes_${dateStr}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+    showToast(`Downloaded ZIP with ${successCount} candidate resumes!`, 'success');
+  } catch (err) {
+    console.error('Error generating ZIP:', err);
+    showToast('Error creating ZIP archive. Resumes can be downloaded individually from the table.', 'error');
+  }
+};
