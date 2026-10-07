@@ -22,7 +22,7 @@
       </div>
       <div class="top-social-actions">
         <a href="https://wa.me/917573905399" target="_blank"><i class="fab fa-whatsapp" style="color: #25D366;"></i> WhatsApp Support</a>
-        <a href="admin/login.html"><i class="fas fa-user-shield"></i> Recruiter Portal</a>
+        <a href="admin/login.html" class="recruiter-badge-link"><i class="fas fa-user-shield"></i> Recruiter Portal</a>
       </div>
     </div>
   </div>
@@ -37,14 +37,28 @@
           <div class="brand-subtitle">HR & Staffing Consultants</div>
         </div>
       </a>
-      <button class="mobile-nav-toggle"><i class="fas fa-bars"></i></button>
-      <ul class="nav-menu">
-        <li><a href="index.html" class="nav-link">Home</a></li>
-        <li><a href="about.html" class="nav-link">About Us</a></li>
-        <li><a href="services.html" class="nav-link">Services</a></li>
+      <button class="mobile-nav-toggle" aria-label="Toggle navigation"><i class="fas fa-bars"></i></button>
+      <ul class="nav-menu" id="navMenu">
+        <li class="nav-menu-header">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <div class="brand-icon-box" style="width: 32px; height: 32px; font-size: 1rem;"><i class="fas fa-briefcase"></i></div>
+            <strong style="color: var(--primary); font-size: 1.05rem;">CareerLine</strong>
+          </div>
+          <button class="mobile-nav-toggle" style="background:none; border:none; width: auto; height: auto; font-size: 1.25rem; color: var(--text-dark);" onclick="document.querySelector('.nav-menu').classList.remove('open')">
+            <i class="fas fa-times"></i>
+          </button>
+        </li>
+        <li><a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="about.html" class="nav-link"><i class="fas fa-info-circle"></i> About Us</a></li>
+        <li><a href="services.html" class="nav-link"><i class="fas fa-cogs"></i> Services</a></li>
         <li><a href="jobs.html" class="nav-link" style="color: var(--primary); font-weight: 700;"><i class="fas fa-search"></i> Pan-India Jobs</a></li>
-        <li><a href="employers.html" class="nav-link active">For Employers</a></li>
-        <li><a href="contact.html" class="nav-link">Contact</a></li>
+        <li><a href="employers.html" class="nav-link active"><i class="fas fa-building"></i> For Employers</a></li>
+        <li><a href="contact.html" class="nav-link"><i class="fas fa-envelope"></i> Contact</a></li>
+        <li class="mobile-drawer-actions">
+          <a href="jobs.html" class="btn btn-outline btn-sm"><i class="fas fa-search"></i> Search Jobs</a>
+          <a href="employers.html" class="btn btn-accent btn-sm"><i class="fas fa-building"></i> Hire Talent</a>
+          <a href="admin/login.html" class="btn btn-primary btn-sm" style="background: var(--primary);"><i class="fas fa-user-shield"></i> Recruiter Portal Login</a>
+        </li>
       </ul>
       <div class="nav-cta-group">
         <a href="jobs.html" class="btn btn-outline btn-sm">Find Jobs</a>

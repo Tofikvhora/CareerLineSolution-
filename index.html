@@ -64,15 +64,30 @@
         <i class="fas fa-bars"></i>
       </button>
 
-      <ul class="nav-menu">
-        <li><a href="index.html" class="nav-link active">Home</a></li>
-        <li><a href="#about" class="nav-link">About Us</a></li>
-        <li><a href="#services" class="nav-link">Services</a></li>
-        <li><a href="#sectors" class="nav-link">Sectors</a></li>
+      <!-- Slide-out Drawer Navigation -->
+      <ul class="nav-menu" id="navMenu">
+        <li class="nav-menu-header">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <div class="brand-icon-box" style="width: 32px; height: 32px; font-size: 1rem;"><i class="fas fa-briefcase"></i></div>
+            <strong style="color: var(--primary); font-size: 1.05rem;">CareerLine</strong>
+          </div>
+          <button class="mobile-nav-toggle" style="background:none; border:none; width: auto; height: auto; font-size: 1.25rem; color: var(--text-dark);" onclick="document.querySelector('.nav-menu').classList.remove('open')">
+            <i class="fas fa-times"></i>
+          </button>
+        </li>
+        <li><a href="index.html" class="nav-link active"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="#about" class="nav-link"><i class="fas fa-info-circle"></i> About Us</a></li>
+        <li><a href="#services" class="nav-link"><i class="fas fa-cogs"></i> Services</a></li>
+        <li><a href="#sectors" class="nav-link"><i class="fas fa-industry"></i> Sectors</a></li>
         <li><a href="jobs.html" class="nav-link" style="color: var(--primary); font-weight: 700;"><i class="fas fa-search"></i> Pan-India Jobs</a></li>
-        <li><a href="#employers" class="nav-link">For Employers</a></li>
-        <li><a href="#testimonials" class="nav-link">Testimonials</a></li>
-        <li><a href="#contact" class="nav-link">Contact</a></li>
+        <li><a href="#employers" class="nav-link"><i class="fas fa-building"></i> For Employers</a></li>
+        <li><a href="#testimonials" class="nav-link"><i class="fas fa-star"></i> Testimonials</a></li>
+        <li><a href="#contact" class="nav-link"><i class="fas fa-envelope"></i> Contact</a></li>
+        <li class="mobile-drawer-actions">
+          <a href="jobs.html" class="btn btn-outline btn-sm"><i class="fas fa-search"></i> Search Jobs</a>
+          <a href="#employers" class="btn btn-accent btn-sm"><i class="fas fa-building"></i> Hire Talent</a>
+          <a href="admin/login.html" class="btn btn-primary btn-sm" style="background: var(--primary);"><i class="fas fa-user-shield"></i> Recruiter Portal Login</a>
+        </li>
       </ul>
 
       <div class="nav-cta-group">
@@ -541,7 +556,7 @@
           </div>
           <div class="job-card-footer">
             <div class="job-salary-text">₹14,00,000 - ₹22,00,000 P.A.</div>
-            <a href="/jobs?q=Developer" class="btn btn-primary btn-sm">View & Apply</a>
+            <a href="jobs.html?q=Developer" class="btn btn-primary btn-sm">View & Apply</a>
           </div>
         </div>
 
@@ -563,7 +578,7 @@
           </div>
           <div class="job-card-footer">
             <div class="job-salary-text">₹7,50,000 - ₹12,00,000 P.A.</div>
-            <a href="/jobs?q=Banking" class="btn btn-primary btn-sm">View & Apply</a>
+            <a href="jobs.html?q=Banking" class="btn btn-primary btn-sm">View & Apply</a>
           </div>
         </div>
 
@@ -585,7 +600,7 @@
           </div>
           <div class="job-card-footer">
             <div class="job-salary-text">₹4,50,000 - ₹6,50,000 P.A.</div>
-            <a href="/jobs?q=BPO" class="btn btn-primary btn-sm">View & Apply</a>
+            <a href="jobs.html?q=BPO" class="btn btn-primary btn-sm">View & Apply</a>
           </div>
         </div>
       </div>
@@ -992,12 +1007,12 @@
       <div class="footer-col">
         <h4>Job Categories</h4>
         <ul class="footer-links">
-          <li><a href="/jobs?category=IT+%26+Software"><i class="fas fa-chevron-right"></i> IT & Software</a></li>
-          <li><a href="/jobs?category=Banking+%26+Financial+Services+(BFSI)"><i class="fas fa-chevron-right"></i> Banking & Finance</a></li>
-          <li><a href="/jobs?category=Manufacturing+%26+Engineering"><i class="fas fa-chevron-right"></i> Manufacturing</a></li>
-          <li><a href="/jobs?category=Healthcare+%26+Pharmaceuticals"><i class="fas fa-chevron-right"></i> Healthcare & Pharma</a></li>
-          <li><a href="/jobs?category=BPO+%2F+KPO+%2F+Customer+Service"><i class="fas fa-chevron-right"></i> BPO & Customer Service</a></li>
-          <li><a href="/jobs?category=Sales+%26+Marketing"><i class="fas fa-chevron-right"></i> Sales & Marketing</a></li>
+          <li><a href="jobs.html?category=IT+%26+Software"><i class="fas fa-chevron-right"></i> IT & Software</a></li>
+          <li><a href="jobs.html?category=Banking+%26+Financial+Services+(BFSI)"><i class="fas fa-chevron-right"></i> Banking & Finance</a></li>
+          <li><a href="jobs.html?category=Manufacturing+%26+Engineering"><i class="fas fa-chevron-right"></i> Manufacturing</a></li>
+          <li><a href="jobs.html?category=Healthcare+%26+Pharmaceuticals"><i class="fas fa-chevron-right"></i> Healthcare & Pharma</a></li>
+          <li><a href="jobs.html?category=BPO+%2F+KPO+%2F+Customer+Service"><i class="fas fa-chevron-right"></i> BPO & Customer Service</a></li>
+          <li><a href="jobs.html?category=Sales+%26+Marketing"><i class="fas fa-chevron-right"></i> Sales & Marketing</a></li>
         </ul>
       </div>
 

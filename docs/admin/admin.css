@@ -318,17 +318,115 @@ body.admin-body {
   }
 }
 
-@media (max-width: 768px) {
+.admin-sidebar-brand {
+  padding: 1.25rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-sidebar-close-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: #94A3B8;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.admin-sidebar-close-btn:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.admin-sidebar-backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(7, 30, 71, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 999;
+}
+.admin-sidebar-backdrop.open {
+  display: block;
+}
+
+@media (max-width: 992px) {
+  .admin-sidebar-close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
   .admin-sidebar {
-    left: -100%;
+    left: -290px;
+    width: 280px;
+    z-index: 1000;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .admin-sidebar.open {
     left: 0;
+    box-shadow: 6px 0 24px rgba(0, 0, 0, 0.4);
   }
   .admin-main {
     margin-left: 0;
   }
+  .admin-topbar {
+    padding: 0.5rem 1rem;
+    min-height: 60px;
+    height: auto;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .admin-topbar .mobile-nav-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    color: var(--primary);
+    background: #F1F5F9;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+  }
+  .admin-page-title {
+    font-size: 1.1rem;
+  }
+  .admin-topbar-actions {
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+  .admin-topbar-actions .btn {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.78rem;
+    min-height: 34px;
+  }
+  .admin-content-body {
+    padding: 1rem;
+  }
   .kpi-cards-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .admin-card-header {
+    padding: 1rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  .admin-card-header > div {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .admin-card-header input,
+  .admin-card-header select {
+    width: 100% !important;
   }
 }

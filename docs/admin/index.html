@@ -15,13 +15,18 @@
   <!-- SIDEBAR NAVIGATION -->
   <aside class="admin-sidebar" id="adminSidebar">
     <div class="admin-sidebar-brand">
-      <div style="width: 38px; height: 38px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.25rem;">
-        <i class="fas fa-briefcase"></i>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div style="width: 38px; height: 38px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.25rem;">
+          <i class="fas fa-briefcase"></i>
+        </div>
+        <div>
+          <div style="font-weight: 800; font-size: 1.15rem; color: #FFFFFF; line-height: 1.1;">CareerLine<span style="color: var(--accent);">Solution</span></div>
+          <div style="font-size: 0.65rem; color: #94A3B8; text-transform: uppercase; letter-spacing: 1px;">Admin Console</div>
+        </div>
       </div>
-      <div>
-        <div style="font-weight: 800; font-size: 1.15rem; color: #FFFFFF; line-height: 1.1;">CareerLine<span style="color: var(--accent);">Solution</span></div>
-        <div style="font-size: 0.65rem; color: #94A3B8; text-transform: uppercase; letter-spacing: 1px;">Admin Console</div>
-      </div>
+      <button class="admin-sidebar-close-btn" onclick="toggleAdminSidebar()" aria-label="Close Sidebar">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
 
     <ul class="admin-nav-list">
@@ -80,13 +85,16 @@
     </div>
   </aside>
 
+  <!-- Mobile Sidebar Backdrop Overlay -->
+  <div id="adminSidebarBackdrop" class="admin-sidebar-backdrop" onclick="toggleAdminSidebar()"></div>
+
   <!-- MAIN VIEW -->
   <main class="admin-main">
     
     <!-- Topbar -->
     <header class="admin-topbar">
-      <div style="display: flex; align-items: center; gap: 1rem;">
-        <button class="mobile-nav-toggle" style="display: none;" onclick="toggleAdminSidebar()"><i class="fas fa-bars"></i></button>
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <button class="mobile-nav-toggle" onclick="toggleAdminSidebar()" aria-label="Toggle Menu"><i class="fas fa-bars"></i></button>
         <h1 class="admin-page-title" id="adminPageTitle">Dashboard Overview</h1>
       </div>
 

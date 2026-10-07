@@ -79,6 +79,14 @@ function adminLogout() {
   window.location.href = 'login.html';
 }
 
+// Mobile Sidebar Toggle
+window.toggleAdminSidebar = function() {
+  const sidebar = document.getElementById('adminSidebar');
+  const backdrop = document.getElementById('adminSidebarBackdrop');
+  if (sidebar) sidebar.classList.toggle('open');
+  if (backdrop) backdrop.classList.toggle('open');
+};
+
 // Navigation Tab Switcher
 window.switchAdminTab = function(tabName) {
   document.querySelectorAll('.admin-nav-link').forEach(link => link.classList.remove('active'));
@@ -91,6 +99,12 @@ window.switchAdminTab = function(tabName) {
 
   const targetTab = document.getElementById(`tab-${tabName}`);
   if (targetTab) targetTab.classList.add('active');
+
+  // Close sidebar on mobile
+  const sidebar = document.getElementById('adminSidebar');
+  const backdrop = document.getElementById('adminSidebarBackdrop');
+  if (sidebar) sidebar.classList.remove('open');
+  if (backdrop) backdrop.classList.remove('open');
 
   const titleEl = document.getElementById('adminPageTitle');
   if (titleEl) {

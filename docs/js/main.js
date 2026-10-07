@@ -56,8 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Close menu when clicking on nav link
-    document.querySelectorAll('.nav-menu .nav-link').forEach(link => {
+    // Close menu when clicking on nav link or mobile action
+    document.querySelectorAll('.nav-menu .nav-link, .nav-menu .btn').forEach(link => {
       link.addEventListener('click', () => {
         navMenu.classList.remove('open');
         const icon = toggleBtn.querySelector('i');
@@ -66,6 +66,18 @@ document.addEventListener('DOMContentLoaded', () => {
           icon.classList.add('fa-bars');
         }
       });
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (navMenu.classList.contains('open') && !navMenu.contains(e.target) && !toggleBtn.contains(e.target)) {
+        navMenu.classList.remove('open');
+        const icon = toggleBtn.querySelector('i');
+        if (icon) {
+          icon.classList.remove('fa-times');
+          icon.classList.add('fa-bars');
+        }
+      }
     });
   }
 

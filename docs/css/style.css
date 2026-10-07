@@ -1849,49 +1849,220 @@ textarea.form-control {
 }
 
 @media (max-width: 768px) {
+  /* Top Bar visible on mobile with compact touch targets */
   .top-bar {
+    display: block;
+    padding: 0.45rem 0;
+    font-size: 0.78rem;
+  }
+  .top-bar-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .top-contact-info {
+    display: flex;
+    gap: 0.75rem;
+  }
+  .top-contact-info .pan-india-badge {
     display: none;
   }
-  .mobile-nav-toggle {
-    display: block;
+  .top-social-actions {
+    display: flex;
+    gap: 0.5rem;
   }
+  .top-social-actions a {
+    font-size: 0.78rem;
+  }
+  .recruiter-badge-link {
+    background: rgba(200, 155, 60, 0.25) !important;
+    color: #F8D37E !important;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 700;
+  }
+
+  /* Mobile Navbar */
+  .navbar {
+    padding: 0.65rem 0;
+  }
+  .brand-logo {
+    gap: 0.5rem;
+  }
+  .brand-icon-box {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+  .brand-title {
+    font-size: 1.15rem;
+  }
+  .brand-subtitle {
+    font-size: 0.6rem;
+  }
+  .mobile-nav-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: rgba(11, 44, 102, 0.08);
+    border-radius: 8px;
+    font-size: 1.35rem;
+  }
+
+  /* Slide-out Mobile Nav Menu */
   .nav-menu {
     position: fixed;
-    top: 70px;
-    left: -100%;
-    width: 100%;
-    height: calc(100vh - 70px);
+    top: 0;
+    left: -290px;
+    width: 280px;
+    height: 100vh;
     background: #FFFFFF;
     flex-direction: column;
-    padding: 2rem;
-    box-shadow: var(--shadow-lg);
-    transition: left 0.3s ease;
-    align-items: flex-start;
+    padding: 1.5rem 1.25rem;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25);
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    align-items: stretch;
+    z-index: 2500;
+    overflow-y: auto;
+    gap: 0.5rem;
   }
   .nav-menu.open {
     left: 0;
   }
+  .nav-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .nav-menu .nav-link {
+    padding: 0.75rem 0.5rem;
+    font-size: 1rem;
+    border-bottom: 1px solid #F1F5F9;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+  .nav-menu .nav-link i {
+    width: 20px;
+    color: var(--accent);
+  }
+  .mobile-drawer-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+  }
+  .mobile-drawer-actions .btn {
+    width: 100%;
+    min-height: 44px;
+  }
   .nav-cta-group {
     display: none;
   }
+
+  /* Hero adjustments */
+  .hero-section {
+    padding: 2.5rem 0 3.5rem;
+  }
   .hero-title {
-    font-size: 2.2rem;
+    font-size: 1.85rem;
+    letter-spacing: -0.5px;
   }
+  .hero-subtitle {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+  }
+  .hero-cta-group {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .hero-cta-group .btn {
+    width: 100%;
+  }
+  .hero-highlights {
+    gap: 0.85rem;
+  }
+  .hero-highlight-item {
+    font-size: 0.825rem;
+  }
+  .hero-card-box {
+    padding: 1.5rem 1.25rem;
+  }
+
+  /* Stats grid */
+  .stats-counter-bar {
+    padding: 2rem 0;
+  }
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+  .stat-number {
+    font-size: 1.9rem;
+  }
+  .stat-label {
+    font-size: 0.75rem;
+  }
+
+  /* Grids */
   .about-grid,
-  .employer-grid {
-    grid-template-columns: 1fr;
-  }
+  .employer-grid,
   .services-grid,
   .jobs-grid,
   .testimonials-grid,
   .contact-cards-grid {
     grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  .about-card-hero {
+    padding: 2rem 1.5rem;
+  }
+  .about-experience-badge {
+    position: static;
+    margin-top: 1rem;
+    display: inline-block;
+  }
+  .about-features-list,
+  .vision-mission-grid {
+    grid-template-columns: 1fr;
   }
   .industries-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
   }
+  .industry-card {
+    padding: 1.25rem 0.75rem;
+  }
+  .section {
+    padding: 3.5rem 0;
+  }
+  .section-title {
+    font-size: 1.75rem;
+  }
+
+  /* Form & Portal */
   .search-input-row {
     grid-template-columns: 1fr;
+  }
+  .filter-pills-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .filter-select {
+    width: 100%;
+    min-height: 44px;
+  }
+  .clear-filter-btn {
+    margin-left: 0;
+    margin-top: 0.5rem;
   }
   .form-grid-2 {
     grid-template-columns: 1fr;
@@ -1901,5 +2072,24 @@ textarea.form-control {
   }
   .footer-grid {
     grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .modal-card {
+    padding: 0;
+    margin: 0.75rem;
+    max-height: 92vh;
+  }
+  .modal-header,
+  .modal-body {
+    padding: 1.25rem;
+  }
+  .floating-actions {
+    bottom: 15px;
+    right: 15px;
+  }
+  .float-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 1.4rem;
   }
 }
