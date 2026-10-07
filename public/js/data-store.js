@@ -98,7 +98,7 @@
         skills: 'React, Node, Express, MongoDB, AWS, Docker',
         coverNote: 'Excited about this opportunity. I have 5 years experience building scalable platforms.',
         resumeFileName: 'Vikram_Verma_Resume.pdf',
-        resumeUrl: '',
+        resumeUrl: 'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iajw8L1R5cGUvQ2F0YWxvZy9QYWdlcyAyIDAgUj4+ZW5kb2JqCjIgMCBvYmo8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PmVuZG9iagozIDAgb2JqPDwvVHlwZS9QYWdlL01lZGlhQm94WzAgMCA2MTIgNzkyXS9QYXJlbnQgMiAwIFIvQ29udGVudHMgNCAwIFI+PmVuZG9iago0IDAgb2JqPDwvTGVuZ3RoIDM2Pj5zdHJlYW0KQlQgL0YxIDE2IFRmIDUwIDcwMCBUZCAoVmlrcmFtYWRpdHlhIFZlcm1hIC0gUmVzdW1lKVRqIEVTCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDUKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDE1IDAwMDAwIG4gCjAwMDAwMDAwNjggMDAwMDAgbiAKMDAwMDAwMDEyNSAwMDAwMCBuIAowMDAwMDAwMjE5IDAwMDAwIG4gCnRyYWlsZXI8PC9Sb290IDEgMCBSL1NpemUgNT4+CnN0YXJ0eHJlZgoyOTAKJSVFT0Y=',
         status: 'Shortlisted',
         recruiterNotes: 'Strong profile, cleared first technical round. Final client interview on Friday.',
         createdAt: new Date(Date.now() - 1 * 86400000).toISOString()
@@ -118,7 +118,7 @@
         skills: 'HNI Banking, Mutual Funds, Life Insurance, Portfolio Growth',
         coverNote: 'Currently handling 250+ HNI accounts with 120% target achievement.',
         resumeFileName: 'Ananya_Deshmukh_CV.pdf',
-        resumeUrl: '',
+        resumeUrl: 'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iajw8L1R5cGUvQ2F0YWxvZy9QYWdlcyAyIDAgUj4+ZW5kb2JqCjIgMCBvYmo8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PmVuZG9iagozIDAgb2JqPDwvVHlwZS9QYWdlL01lZGlhQm94WzAgMCA2MTIgNzkyXS9QYXJlbnQgMiAwIFIvQ29udGVudHMgNCAwIFI+PmVuZG9iago0IDAgb2JqPDwvTGVuZ3RoIDMzPj5zdHJlYW0KQlQgL0YxIDE2IFRmIDUwIDcwMCBUZCAoQW5hbnlhIERlc2htdWtoIC0gQ1YpVGogRVQKZW5kc3RyZWFtCmVuZG9iagp4cmVmCjAgNQowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMTUgMDAwMDAgbiAKMDAwMDAwMDA2OCAwMDAwMCBuIAowMDAwMDAwMTI1IDAwMDAwIG4gCjAwMDAwMDAyMTkgMDAwMDAgbiAKdHJhaWxlcjw8L1Jvb3QgMSAwIFIvU2l6ZSA1PioKc3RhcnR4cmVmCjI4NwolaUVPZg==',
         status: 'Interview Scheduled',
         recruiterNotes: 'Documents verified. Client interview scheduled with Regional HR.',
         createdAt: new Date(Date.now() - 2 * 86400000).toISOString()
@@ -170,9 +170,9 @@
   // Get or initialize storage
   function getDB() {
     const version = localStorage.getItem('cls_db_version');
-    if (version !== 'v2') {
+    if (version !== 'v3') {
       localStorage.removeItem('cls_local_database');
-      localStorage.setItem('cls_db_version', 'v2');
+      localStorage.setItem('cls_db_version', 'v3');
     }
     let raw = localStorage.getItem('cls_local_database');
     if (!raw) {
@@ -187,7 +187,23 @@
   }
 
   function saveDB(data) {
-    localStorage.setItem('cls_local_database', JSON.stringify(data));
+    try {
+      localStorage.setItem('cls_local_database', JSON.stringify(data));
+    } catch (e) {
+      console.warn('LocalStorage quota reached, pruning large embedded base64 assets...', e);
+      if (data && data.applications) {
+        data.applications.forEach((app, idx) => {
+          if (idx > 1 && app.resumeUrl && app.resumeUrl.startsWith('data:')) {
+            app.resumeUrl = '';
+          }
+        });
+        try {
+          localStorage.setItem('cls_local_database', JSON.stringify(data));
+        } catch (e2) {
+          console.error('Failed to save to localStorage:', e2);
+        }
+      }
+    }
   }
 
   // Intercept window.fetch for /api/* on static environments
@@ -310,11 +326,34 @@
     // 5. POST /api/apply
     if (pathname === '/api/apply' && method === 'POST') {
       let bodyData = {};
+      let resumeFileName = '';
+      let resumeUrl = '';
+
       if (options.body instanceof FormData) {
         bodyData = Object.fromEntries(options.body.entries());
+        const file = options.body.get('resume');
+        if (file && typeof file === 'object' && file.size > 0) {
+          resumeFileName = file.name || 'Candidate_Resume.pdf';
+          try {
+            // Read file into Data URL so it can be previewed and downloaded in browser storage
+            resumeUrl = await new Promise((resolve) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(reader.result || '');
+              reader.onerror = () => resolve('');
+              reader.readAsDataURL(file);
+            });
+          } catch (e) {
+            resumeUrl = '';
+          }
+        }
       } else if (typeof options.body === 'string') {
-        try { bodyData = JSON.parse(options.body); } catch(e){}
+        try {
+          bodyData = JSON.parse(options.body);
+          resumeFileName = bodyData.resumeFileName || '';
+          resumeUrl = bodyData.resumeUrl || '';
+        } catch (e) {}
       }
+
       const newApp = {
         id: 'app_' + Date.now(),
         jobId: bodyData.jobId || 'general',
@@ -329,16 +368,19 @@
         noticePeriod: bodyData.noticePeriod || '',
         skills: bodyData.skills || '',
         coverNote: bodyData.coverNote || '',
-        resumeFileName: bodyData.resume ? (bodyData.resume.name || 'Resume.pdf') : 'Resume.pdf',
-        resumeUrl: '',
+        resumeFileName: resumeFileName || (bodyData.resume ? (bodyData.resume.name || 'Resume.pdf') : 'Resume.pdf'),
+        resumeUrl: resumeUrl || '',
         status: 'New',
+        recruiterNotes: 'Application received via portal',
         createdAt: new Date().toISOString()
       };
       db.applications.unshift(newApp);
       saveDB(db);
       return mockJson({
         success: true,
-        message: 'Your job application has been submitted successfully! Our HR team will review your profile shortly.'
+        message: 'Your job application has been submitted successfully! Our HR team will review your profile shortly.',
+        applicationId: newApp.id,
+        resumeUrl: newApp.resumeUrl
       });
     }
 

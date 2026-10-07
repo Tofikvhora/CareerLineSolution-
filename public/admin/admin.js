@@ -79,6 +79,19 @@ function adminLogout() {
   window.location.href = 'login.html';
 }
 
+function resolveResumeUrl(url) {
+  if (!url) return '';
+  if (url.startsWith('data:') || url.startsWith('blob:') || url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  if (url.startsWith('/uploads/')) {
+    if (window.location.protocol === 'file:' || (window.location.port !== '5000' && window.location.port !== '')) {
+      return `http://localhost:5000${url}`;
+    }
+  }
+  return url;
+}
+
 // Mobile Sidebar Toggle
 window.toggleAdminSidebar = function() {
   const sidebar = document.getElementById('adminSidebar');
@@ -420,10 +433,14 @@ async function loadAdminApplications() {
           <td><span style="font-size: 0.85rem;">${escapeHtml(app.noticePeriod)}</span></td>
           <td>
             ${app.resumeUrl ? `
-              <a href="${app.resumeUrl}" target="_blank" class="btn btn-outline btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+              <a href="${resolveResumeUrl(app.resumeUrl)}" target="_blank" download="${escapeAttr(app.resumeFileName || 'Resume')}" class="btn btn-outline btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
                 <i class="fas fa-download"></i> CV
               </a>
-            ` : `<span style="color: var(--text-muted); font-size: 0.8rem;">No File</span>`}
+            ` : (app.resumeFileName ? `
+              <span class="badge" style="background: rgba(11,44,102,0.08); color: var(--primary); font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px;" title="${escapeAttr(app.resumeFileName)}">
+                <i class="fas fa-file-alt"></i> ${escapeHtml(app.resumeFileName.length > 12 ? app.resumeFileName.substring(0, 10) + '...' : app.resumeFileName)}
+              </span>
+            ` : `<span style="color: var(--text-muted); font-size: 0.8rem;">No File</span>`)}
           </td>
           <td>
             <select class="form-control" style="min-height: 32px; padding: 0.2rem 0.5rem; font-size: 0.8rem; font-weight: 600;" onchange="updateApplicationStatus('${app.id}', this.value)">
@@ -511,13 +528,20 @@ window.viewCandidateModal = function(appId) {
     ${app.resumeUrl ? `
       <div style="margin-bottom: 1.5rem;">
         <strong>Uploaded Resume:</strong>
-        <div style="margin-top: 0.5rem;">
-          <a href="${app.resumeUrl}" target="_blank" class="btn btn-primary btn-sm">
+        <div style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <a href="${resolveResumeUrl(app.resumeUrl)}" target="_blank" download="${escapeAttr(app.resumeFileName || 'Resume')}" class="btn btn-primary btn-sm">
             <i class="fas fa-file-pdf"></i> View / Download Resume (${escapeHtml(app.resumeFileName || 'Resume')})
           </a>
         </div>
       </div>
-    ` : '<div style="margin-bottom: 1rem; color: var(--text-muted);">No resume file attached.</div>'}
+    ` : (app.resumeFileName ? `
+      <div style="margin-bottom: 1.5rem;">
+        <strong>Uploaded Resume:</strong>
+        <div style="margin-top: 0.5rem; background: #F8FAFC; padding: 0.75rem 1rem; border-radius: 6px; border: 1px solid var(--border-color); font-size: 0.9rem;">
+          <i class="fas fa-paperclip" style="color: var(--primary); margin-right: 0.35rem;"></i> File Name: <strong>${escapeHtml(app.resumeFileName)}</strong>
+        </div>
+      </div>
+    ` : '<div style="margin-bottom: 1rem; color: var(--text-muted);">No resume file attached.</div>')}
 
     <div style="border-top: 1px solid var(--border-color); padding-top: 1.25rem;">
       <label class="form-label" for="candModalNotes">Internal Recruiter Notes</label>
@@ -1014,7 +1038,7 @@ window.downloadAllResumesZip = async function () {
             successCount++;
           }
         } else {
-          const resp = await fetch(app.resumeUrl);
+          const resp = await fetch(resolveResumeUrl(app.resumeUrl));
           if (resp.ok) {
             const blob = await resp.blob();
             folder.file(filename, blob);

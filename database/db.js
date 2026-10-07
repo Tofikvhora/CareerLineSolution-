@@ -254,7 +254,7 @@ function initDefaultData() {
         skills: 'React, Node, Express, MongoDB, AWS, Docker',
         coverNote: 'Excited about this opportunity. I have 5 years experience building scalable FinTech platforms.',
         resumeFileName: 'Vikram_Verma_Resume.pdf',
-        resumeUrl: '',
+        resumeUrl: 'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iajw8L1R5cGUvQ2F0YWxvZy9QYWdlcyAyIDAgUj4+ZW5kb2JqCjIgMCBvYmo8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PmVuZG9iagozIDAgb2JqPDwvVHlwZS9QYWdlL01lZGlhQm94WzAgMCA2MTIgNzkyXS9QYXJlbnQgMiAwIFIvQ29udGVudHMgNCAwIFI+PmVuZG9iago0IDAgb2JqPDwvTGVuZ3RoIDM2Pj5zdHJlYW0KQlQgL0YxIDE2IFRmIDUwIDcwMCBUZCAoVmlrcmFtYWRpdHlhIFZlcm1hIC0gUmVzdW1lKVRqIEVTCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDUKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDE1IDAwMDAwIG4gCjAwMDAwMDAwNjggMDAwMDAgbiAKMDAwMDAwMDEyNSAwMDAwMCBuIAowMDAwMDAwMjE5IDAwMDAwIG4gCnRyYWlsZXI8PC9Sb290IDEgMCBSL1NpemUgNT4+CnN0YXJ0eHJlZgoyOTAKJSVFT0Y=',
         status: 'Shortlisted',
         recruiterNotes: 'Strong profile, cleared first technical round. Final client interview on Friday.',
         createdAt: new Date(Date.now() - 1 * 86400000).toISOString()
@@ -274,7 +274,7 @@ function initDefaultData() {
         skills: 'HNI Banking, Mutual Funds, Life Insurance, Portfolio Growth',
         coverNote: 'Currently handling 250+ HNI accounts with 120% target achievement.',
         resumeFileName: 'Ananya_Deshmukh_CV.pdf',
-        resumeUrl: '',
+        resumeUrl: 'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iajw8L1R5cGUvQ2F0YWxvZy9QYWdlcyAyIDAgUj4+ZW5kb2JqCjIgMCBvYmo8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PmVuZG9iagozIDAgb2JqPDwvVHlwZS9QYWdlL01lZGlhQm94WzAgMCA2MTIgNzkyXS9QYXJlbnQgMiAwIFIvQ29udGVudHMgNCAwIFI+PmVuZG9iago0IDAgb2JqPDwvTGVuZ3RoIDMzPj5zdHJlYW0KQlQgL0YxIDE2IFRmIDUwIDcwMCBUZCAoQW5hbnlhIERlc2htdWtoIC0gQ1YpVGogRVQKZW5kc3RyZWFtCmVuZG9iagp4cmVmCjAgNQowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDAwMTUgMDAwMDAgbiAKMDAwMDAwMDA2OCAwMDAwMCBuIAowMDAwMDAwMTI1IDAwMDAwIG4gCjAwMDAwMDAyMTkgMDAwMDAgbiAKdHJhaWxlcjw8L1Jvb3QgMSAwIFIvU2l6ZSA1PioKc3RhcnR4cmVmCjI4NwolaUVPZg==',
         status: 'Interview Scheduled',
         recruiterNotes: 'Documents verified. Client interview scheduled with Regional HR.',
         createdAt: new Date(Date.now() - 2 * 86400000).toISOString()

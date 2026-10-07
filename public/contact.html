@@ -40,11 +40,16 @@
       <button class="mobile-nav-toggle" aria-label="Toggle navigation"><i class="fas fa-bars"></i></button>
       <ul class="nav-menu" id="navMenu">
         <li class="nav-menu-header">
-          <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <div class="brand-icon-box" style="width: 32px; height: 32px; font-size: 1rem;"><i class="fas fa-briefcase"></i></div>
-            <strong style="color: var(--primary); font-size: 1.05rem;">CareerLine</strong>
-          </div>
-          <button class="mobile-nav-toggle" style="background:none; border:none; width: auto; height: auto; font-size: 1.25rem; color: var(--text-dark);" onclick="document.querySelector('.nav-menu').classList.remove('open')">
+          <a href="index.html" class="brand-logo" style="text-decoration: none;">
+            <div class="brand-icon-box">
+              <i class="fas fa-briefcase"></i>
+            </div>
+            <div class="brand-text-wrap">
+              <div class="brand-title">CareerLine<span>Solution</span></div>
+              <div class="brand-subtitle">HR &amp; Staffing Consultants</div>
+            </div>
+          </a>
+          <button class="mobile-nav-toggle mobile-close-btn" aria-label="Close navigation" onclick="document.querySelector('.nav-menu').classList.remove('open'); document.body.classList.remove('menu-open');">
             <i class="fas fa-times"></i>
           </button>
         </li>

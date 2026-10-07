@@ -202,62 +202,76 @@ app.get('/api/job-meta', (req, res) => {
 });
 
 // 5. Submit Candidate Job Application
-app.post('/api/apply', upload.single('resume'), (req, res) => {
-  try {
-    const {
-      jobId,
-      fullName,
-      email,
-      phone,
-      currentLocation,
-      experience,
-      currentCTC,
-      expectedCTC,
-      noticePeriod,
-      skills,
-      coverNote
-    } = req.body;
-
-    if (!fullName || !email || !phone) {
-      return res.status(400).json({ success: false, message: 'Please provide full name, email and phone number.' });
+app.post('/api/apply', (req, res) => {
+  upload.single('resume')(req, res, (uploadErr) => {
+    if (uploadErr) {
+      if (uploadErr instanceof multer.MulterError) {
+        if (uploadErr.code === 'LIMIT_FILE_SIZE') {
+          return res.status(400).json({ success: false, message: 'Resume file is too large. Maximum size allowed is 10MB.' });
+        }
+        return res.status(400).json({ success: false, message: `Upload error: ${uploadErr.message}` });
+      }
+      return res.status(400).json({ success: false, message: uploadErr.message || 'Error uploading file' });
     }
 
-    const data = readData();
-    const job = data.jobs.find(j => j.id === jobId) || { title: 'General Application' };
+    try {
+      const {
+        jobId,
+        fullName,
+        email,
+        phone,
+        currentLocation,
+        experience,
+        currentCTC,
+        expectedCTC,
+        noticePeriod,
+        skills,
+        coverNote
+      } = req.body;
 
-    const newApplication = {
-      id: 'app_' + Date.now(),
-      jobId: jobId || 'general',
-      jobTitle: job.title,
-      fullName,
-      email,
-      phone,
-      currentLocation: currentLocation || 'Not Specified',
-      experience: experience || 'Fresher',
-      currentCTC: currentCTC || 'Not Disclosed',
-      expectedCTC: expectedCTC || 'Negotiable',
-      noticePeriod: noticePeriod || 'Immediate',
-      skills: skills || '',
-      coverNote: coverNote || '',
-      resumeFileName: req.file ? req.file.originalname : '',
-      resumeUrl: req.file ? `/uploads/resumes/${req.file.filename}` : '',
-      status: 'New',
-      recruiterNotes: 'Application received via portal',
-      createdAt: new Date().toISOString()
-    };
+      if (!fullName || !email || !phone) {
+        return res.status(400).json({ success: false, message: 'Please provide full name, email and phone number.' });
+      }
 
-    data.applications.unshift(newApplication);
-    writeData(data);
+      const data = readData();
+      const job = (data.jobs || []).find(j => j.id === jobId) || { title: 'General Application' };
 
-    res.json({
-      success: true,
-      message: 'Your job application has been submitted successfully! Our HR team will review your profile shortly.',
-      applicationId: newApplication.id
-    });
-  } catch (error) {
-    console.error('Apply error:', error);
-    res.status(500).json({ success: false, message: 'Failed to process application. Please try again.' });
-  }
+      const newApplication = {
+        id: 'app_' + Date.now(),
+        jobId: jobId || 'general',
+        jobTitle: job.title || 'General Application',
+        fullName,
+        email,
+        phone,
+        currentLocation: currentLocation || 'Not Specified',
+        experience: experience || 'Fresher',
+        currentCTC: currentCTC || 'Not Disclosed',
+        expectedCTC: expectedCTC || 'Negotiable',
+        noticePeriod: noticePeriod || 'Immediate',
+        skills: skills || '',
+        coverNote: coverNote || '',
+        resumeFileName: req.file ? req.file.originalname : '',
+        resumeUrl: req.file ? `/uploads/resumes/${req.file.filename}` : '',
+        status: 'New',
+        recruiterNotes: 'Application received via portal',
+        createdAt: new Date().toISOString()
+      };
+
+      if (!data.applications) data.applications = [];
+      data.applications.unshift(newApplication);
+      writeData(data);
+
+      res.json({
+        success: true,
+        message: 'Your job application has been submitted successfully! Our HR team will review your profile shortly.',
+        applicationId: newApplication.id,
+        resumeUrl: newApplication.resumeUrl
+      });
+    } catch (error) {
+      console.error('Apply error:', error);
+      res.status(500).json({ success: false, message: 'Failed to process application. Please try again.' });
+    }
+  });
 });
 
 // 6. Submit Employer Staffing Requirement

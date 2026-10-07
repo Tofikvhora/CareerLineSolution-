@@ -51,6 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeMobileNav() {
     if (navMenu) navMenu.classList.remove('open');
     if (backdrop) backdrop.classList.remove('open');
+    document.body.classList.remove('menu-open');
+    document.body.style.overflow = '';
     if (toggleBtn) {
       const icon = toggleBtn.querySelector('i');
       if (icon) {
@@ -63,6 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function openMobileNav() {
     if (navMenu) navMenu.classList.add('open');
     if (backdrop) backdrop.classList.add('open');
+    document.body.classList.add('menu-open');
+    document.body.style.overflow = 'hidden';
     if (toggleBtn) {
       const icon = toggleBtn.querySelector('i');
       if (icon) {

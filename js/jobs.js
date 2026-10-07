@@ -487,8 +487,13 @@ function bindApplicationForm() {
     e.preventDefault();
     const submitBtn = form.querySelector('button[type="submit"]');
     const origText = submitBtn.innerHTML;
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting application...';
+    const file = fileInput?.files?.[0];
+    if (file && file.size > 10 * 1024 * 1024) {
+      showToast('Selected resume file is larger than 10MB. Please upload a smaller file.', 'warning');
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = origText;
+      return;
+    }
 
     const formData = new FormData(form);
 
