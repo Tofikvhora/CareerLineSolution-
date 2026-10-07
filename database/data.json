@@ -12,6 +12,32 @@
   ],
   "jobs": [
     {
+      "id": "job_1791381924591",
+      "title": "Data entry",
+      "category": "IT & Software",
+      "company": "Aerosol IO ltd",
+      "location": "Mumbai",
+      "city": "Mumbai",
+      "state": "Pan-India",
+      "jobType": "Full-Time",
+      "workMode": "On-Site",
+      "experience": "3",
+      "experienceRange": "1-3",
+      "salary": "150000",
+      "openings": 3,
+      "urgent": true,
+      "featured": true,
+      "status": "Active",
+      "skills": [
+        "Excel DataEntry",
+        "Data managment"
+      ],
+      "description": "",
+      "responsibilities": "",
+      "requirements": "",
+      "createdAt": "2026-10-07T14:05:24.591Z"
+    },
+    {
       "id": "job_1791376766393",
       "title": "Senior Software Enginner",
       "category": "IT & Software",

@@ -38,47 +38,64 @@ function showToast(message, type = 'success') {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Mobile Nav Toggle
-  const toggleBtn = document.querySelector('.mobile-nav-toggle');
+  // Mobile Nav Toggle with Backdrop
+  const toggleBtn = document.querySelector('.site-header .mobile-nav-toggle');
   const navMenu = document.querySelector('.nav-menu');
-  if (toggleBtn && navMenu) {
-    toggleBtn.addEventListener('click', () => {
-      navMenu.classList.toggle('open');
+  let backdrop = document.querySelector('.nav-backdrop');
+  if (!backdrop) {
+    backdrop = document.createElement('div');
+    backdrop.className = 'nav-backdrop';
+    document.body.appendChild(backdrop);
+  }
+
+  function closeMobileNav() {
+    if (navMenu) navMenu.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('open');
+    if (toggleBtn) {
       const icon = toggleBtn.querySelector('i');
       if (icon) {
-        if (navMenu.classList.contains('open')) {
-          icon.classList.remove('fa-bars');
-          icon.classList.add('fa-times');
-        } else {
-          icon.classList.remove('fa-times');
-          icon.classList.add('fa-bars');
-        }
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-bars');
+      }
+    }
+  }
+
+  function openMobileNav() {
+    if (navMenu) navMenu.classList.add('open');
+    if (backdrop) backdrop.classList.add('open');
+    if (toggleBtn) {
+      const icon = toggleBtn.querySelector('i');
+      if (icon) {
+        icon.classList.remove('fa-bars');
+        icon.classList.add('fa-times');
+      }
+    }
+  }
+
+  if (toggleBtn && navMenu) {
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (navMenu.classList.contains('open')) {
+        closeMobileNav();
+      } else {
+        openMobileNav();
       }
     });
+
+    if (backdrop) {
+      backdrop.addEventListener('click', closeMobileNav);
+    }
 
     // Close menu when clicking on nav link or mobile action
     document.querySelectorAll('.nav-menu .nav-link, .nav-menu .btn').forEach(link => {
-      link.addEventListener('click', () => {
-        navMenu.classList.remove('open');
-        const icon = toggleBtn.querySelector('i');
-        if (icon) {
-          icon.classList.remove('fa-times');
-          icon.classList.add('fa-bars');
-        }
-      });
+      link.addEventListener('click', closeMobileNav);
     });
 
-    // Close menu when clicking outside
-    document.addEventListener('click', (e) => {
-      if (navMenu.classList.contains('open') && !navMenu.contains(e.target) && !toggleBtn.contains(e.target)) {
-        navMenu.classList.remove('open');
-        const icon = toggleBtn.querySelector('i');
-        if (icon) {
-          icon.classList.remove('fa-times');
-          icon.classList.add('fa-bars');
-        }
-      }
-    });
+    // Close button inside drawer
+    const drawerCloseBtn = navMenu.querySelector('.mobile-nav-toggle');
+    if (drawerCloseBtn) {
+      drawerCloseBtn.addEventListener('click', closeMobileNav);
+    }
   }
 
   // Header scroll shadow

@@ -72,7 +72,7 @@ img {
 /* Container */
 .container {
   width: 100%;
-  max-width: 1240px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 0 1.25rem;
 }
@@ -83,9 +83,12 @@ img {
 .top-bar {
   background-color: var(--primary-dark);
   color: #E2E8F0;
-  font-size: 0.875rem;
+  font-size: 0.825rem;
   padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  z-index: 1001;
+  line-height: 1.4;
 }
 
 .top-bar-inner {
@@ -100,14 +103,16 @@ img {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
 .top-contact-info a {
   color: #E2E8F0;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .top-contact-info a:hover {
@@ -122,10 +127,11 @@ img {
 
 .top-social-actions a {
   color: #E2E8F0;
-  font-size: 0.95rem;
+  font-size: 0.825rem;
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.45rem;
+  white-space: nowrap;
 }
 
 .top-social-actions a:hover {
@@ -143,14 +149,39 @@ img {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.recruiter-badge-link {
+  background: rgba(200, 155, 60, 0.2) !important;
+  color: #F8D37E !important;
+  border: 1px solid rgba(200, 155, 60, 0.4);
+  padding: 0.25rem 0.65rem;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.recruiter-badge-link:hover {
+  background: var(--accent) !important;
+  color: #071E47 !important;
 }
 
 /* ==========================================
-   NAVBAR
+   DESKTOP DEFAULT: HIDE MOBILE-ONLY DRAWER ELEMENTS
+   ========================================== */
+.nav-menu-header,
+.mobile-drawer-actions,
+.nav-backdrop {
+  display: none !important;
+}
+
+/* ==========================================
+   SITE NAVBAR
    ========================================== */
 .site-header {
   background-color: var(--bg-white);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 12px rgba(11, 44, 102, 0.08);
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -158,14 +189,16 @@ img {
 }
 
 .site-header.scrolled {
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 20px rgba(11, 44, 102, 0.12);
 }
 
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.85rem 0;
+  min-height: 72px;
+  padding: 0.4rem 0;
+  gap: 1.25rem;
 }
 
 .brand-logo {
@@ -173,6 +206,7 @@ img {
   align-items: center;
   gap: 0.75rem;
   text-decoration: none;
+  flex-shrink: 0;
 }
 
 .brand-icon-box {
@@ -184,8 +218,9 @@ img {
   align-items: center;
   justify-content: center;
   color: var(--accent);
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   box-shadow: 0 4px 10px rgba(11, 44, 102, 0.25);
+  flex-shrink: 0;
 }
 
 .brand-text-wrap {
@@ -198,7 +233,8 @@ img {
   font-weight: 800;
   letter-spacing: -0.5px;
   color: var(--primary);
-  line-height: 1.1;
+  line-height: 1.15;
+  white-space: nowrap;
 }
 
 .brand-title span {
@@ -206,53 +242,130 @@ img {
 }
 
 .brand-subtitle {
-  font-size: 0.68rem;
-  font-weight: 600;
+  font-size: 0.65rem;
+  font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 1.2px;
+  white-space: nowrap;
+  line-height: 1.2;
 }
 
 .nav-menu {
   display: flex;
   align-items: center;
   list-style: none;
-  gap: 1.5rem;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
 }
 
 .nav-link {
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   font-weight: 600;
-  color: var(--text-dark);
-  padding: 0.4rem 0.2rem;
+  color: #1E293B;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  white-space: nowrap !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+  text-decoration: none;
   position: relative;
 }
 
-.nav-link:hover,
+.nav-link i {
+  font-size: 0.82rem;
+  color: #64748B;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--primary);
+  background-color: rgba(11, 44, 102, 0.05);
+}
+
+.nav-link:hover i {
+  color: var(--accent);
+}
+
 .nav-link.active {
+  color: var(--primary);
+  background-color: rgba(11, 44, 102, 0.08);
+  font-weight: 700;
+}
+
+.nav-link.active i {
   color: var(--primary);
 }
 
-.nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0%;
-  height: 2px;
-  background-color: var(--accent);
-  transition: width 0.3s ease;
+/* Distinctive Pan-India Jobs Pill Link */
+.nav-link.nav-link-jobs,
+.nav-link[href*="jobs.html"] {
+  background: #EFF6FF;
+  color: #1D4ED8 !important;
+  border: 1px solid #BFDBFE;
+  padding: 0.45rem 0.85rem;
+  border-radius: 20px;
+  font-weight: 700;
 }
 
-.nav-link:hover::after,
-.nav-link.active::after {
-  width: 100%;
+.nav-link.nav-link-jobs i,
+.nav-link[href*="jobs.html"] i {
+  color: var(--accent) !important;
+}
+
+.nav-link.nav-link-jobs:hover,
+.nav-link[href*="jobs.html"]:hover {
+  background: #DBEAFE;
+  color: var(--primary) !important;
+  border-color: #93C5FD;
 }
 
 .nav-cta-group {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.65rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.nav-cta-group .btn {
+  white-space: nowrap !important;
+  padding: 0.5rem 1.15rem;
+  min-height: 40px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 6px;
+}
+
+.nav-cta-group .btn-outline,
+.btn-nav-find {
+  background: transparent;
+  border: 1.5px solid var(--primary);
+  color: var(--primary) !important;
+}
+
+.nav-cta-group .btn-outline:hover,
+.btn-nav-find:hover {
+  background: var(--primary);
+  color: #FFFFFF !important;
+}
+
+.nav-cta-group .btn-accent,
+.btn-nav-hire {
+  background: linear-gradient(135deg, #D4AF37 0%, #C89B3C 100%);
+  color: #071E47 !important;
+  border: 1px solid #C89B3C;
+  box-shadow: 0 4px 10px rgba(200, 155, 60, 0.25);
+}
+
+.nav-cta-group .btn-accent:hover,
+.btn-nav-hire:hover {
+  background: linear-gradient(135deg, #E5C158 0%, #D4AF37 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(200, 155, 60, 0.35);
 }
 
 /* Mobile Nav Toggle */
@@ -1848,6 +1961,108 @@ textarea.form-control {
   }
 }
 
+@media (max-width: 1024px) {
+  /* Mobile Nav Toggle Button */
+  .mobile-nav-toggle {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: rgba(11, 44, 102, 0.08);
+    border-radius: 8px;
+    font-size: 1.35rem;
+    color: var(--primary);
+  }
+
+  /* Slide-out Mobile Nav Menu */
+  .nav-menu {
+    position: fixed;
+    top: 0;
+    left: -320px;
+    width: 300px;
+    height: 100vh;
+    background: #FFFFFF;
+    flex-direction: column;
+    padding: 0;
+    box-shadow: 6px 0 25px rgba(0, 0, 0, 0.3);
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    align-items: stretch;
+    z-index: 2500;
+    overflow-y: auto;
+    gap: 0;
+  }
+
+  .nav-menu.open {
+    left: 0;
+  }
+
+  .nav-menu-header {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.25rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .nav-menu .nav-link {
+    padding: 0.85rem 1.25rem;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #F1F5F9;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-radius: 0;
+  }
+
+  .nav-menu .nav-link i {
+    width: 22px;
+    color: var(--accent);
+    font-size: 0.95rem;
+  }
+
+  .nav-menu .nav-link.active {
+    background-color: rgba(11, 44, 102, 0.08);
+    color: var(--primary);
+  }
+
+  .mobile-drawer-actions {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    margin-top: auto;
+    border-top: 1px solid var(--border-color);
+    background: #F8FAFC;
+  }
+
+  .mobile-drawer-actions .btn {
+    width: 100%;
+    min-height: 44px;
+    font-size: 0.9rem;
+  }
+
+  .nav-cta-group {
+    display: none;
+  }
+
+  .nav-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(7, 30, 71, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 2400;
+  }
+
+  .nav-backdrop.open {
+    display: block;
+  }
+}
+
 @media (max-width: 768px) {
   /* Top Bar visible on mobile with compact touch targets */
   .top-bar {
@@ -1863,7 +2078,7 @@ textarea.form-control {
   }
   .top-contact-info {
     display: flex;
-    gap: 0.75rem;
+    gap: 0.65rem;
   }
   .top-contact-info .pan-india-badge {
     display: none;
@@ -1873,7 +2088,7 @@ textarea.form-control {
     gap: 0.5rem;
   }
   .top-social-actions a {
-    font-size: 0.78rem;
+    font-size: 0.75rem;
   }
   .recruiter-badge-link {
     background: rgba(200, 155, 60, 0.25) !important;
@@ -1881,6 +2096,7 @@ textarea.form-control {
     padding: 0.2rem 0.5rem;
     border-radius: 4px;
     font-weight: 700;
+    font-size: 0.75rem;
   }
 
   /* Mobile Navbar */
@@ -1900,72 +2116,6 @@ textarea.form-control {
   }
   .brand-subtitle {
     font-size: 0.6rem;
-  }
-  .mobile-nav-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    background: rgba(11, 44, 102, 0.08);
-    border-radius: 8px;
-    font-size: 1.35rem;
-  }
-
-  /* Slide-out Mobile Nav Menu */
-  .nav-menu {
-    position: fixed;
-    top: 0;
-    left: -290px;
-    width: 280px;
-    height: 100vh;
-    background: #FFFFFF;
-    flex-direction: column;
-    padding: 1.5rem 1.25rem;
-    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25);
-    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    align-items: stretch;
-    z-index: 2500;
-    overflow-y: auto;
-    gap: 0.5rem;
-  }
-  .nav-menu.open {
-    left: 0;
-  }
-  .nav-menu-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 1rem;
-    margin-bottom: 0.75rem;
-    border-bottom: 1px solid var(--border-color);
-  }
-  .nav-menu .nav-link {
-    padding: 0.75rem 0.5rem;
-    font-size: 1rem;
-    border-bottom: 1px solid #F1F5F9;
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-  }
-  .nav-menu .nav-link i {
-    width: 20px;
-    color: var(--accent);
-  }
-  .mobile-drawer-actions {
-    margin-top: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border-color);
-  }
-  .mobile-drawer-actions .btn {
-    width: 100%;
-    min-height: 44px;
-  }
-  .nav-cta-group {
-    display: none;
   }
 
   /* Hero adjustments */
