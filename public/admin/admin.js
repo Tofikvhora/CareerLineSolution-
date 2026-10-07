@@ -461,6 +461,7 @@ async function loadAdminApplications() {
       `).join('');
     }
   } catch (err) {
+    console.error('Error loading applications:', err);
     tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--danger);">Error loading applications.</td></tr>`;
   }
 }
@@ -898,6 +899,11 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+function escapeAttr(str) {
+  if (!str) return '';
+  return String(str).replace(/"/g, '&quot;').replace(/'/g, "\\'");
 }
 
 // ==========================================

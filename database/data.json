@@ -65,6 +65,26 @@
   ],
   "applications": [
     {
+      "id": "app_1791400358980",
+      "jobId": "job_1791381924591",
+      "jobTitle": "Data entry",
+      "fullName": "tofik",
+      "email": "tofikvora6@gmail.com",
+      "phone": "9601874036",
+      "currentLocation": "ahmedabad",
+      "experience": "Fresher / 0 Years",
+      "currentCTC": "150000",
+      "expectedCTC": "15000",
+      "noticePeriod": "Immediate Joiner",
+      "skills": "",
+      "coverNote": "",
+      "resumeFileName": "SettelmentLetter.pdf",
+      "resumeUrl": "/uploads/resumes/SettelmentLetter_pdf-1791400358965-469677.pdf",
+      "status": "New",
+      "recruiterNotes": "Application received via portal",
+      "createdAt": "2026-10-07T19:12:38.980Z"
+    },
+    {
       "id": "app_1791379474320",
       "jobId": "job_1791376766393",
       "jobTitle": "Senior Software Enginner",
