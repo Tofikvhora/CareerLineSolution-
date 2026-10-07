@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin & Recruiter Portal Login | CareerLine Solution</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230B2C66'/><path d='M30 70 L50 30 L70 70 Z' fill='%23C89B3C'/></svg>">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #071E47 0%, #0B2C66 60%, #123B7A 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .login-container {
+      width: 100%;
+      max-width: 440px;
+      background: #FFFFFF;
+      border-radius: var(--radius-lg);
+      padding: 2.75rem 2.25rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .demo-credentials-box {
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+      color: #1E3A8A;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <div style="width: 52px; height: 52px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; color: var(--accent); font-size: 1.6rem; margin-bottom: 0.75rem;">
+        <i class="fas fa-user-shield"></i>
+      </div>
+      <h2 style="color: var(--primary); font-size: 1.6rem; margin-bottom: 0.25rem;">Admin & Recruiter Portal</h2>
+      <p style="color: var(--text-muted); font-size: 0.88rem;">CareerLine Solution Management Console</p>
+    </div>
+
+    <!-- Demo hint -->
+    <div class="demo-credentials-box">
+      <div style="font-weight: 700; margin-bottom: 0.35rem;"><i class="fas fa-info-circle"></i> Default Login Credentials:</div>
+      <div><strong>Email:</strong> admin@careerlinesolution.com</div>
+      <div><strong>Password:</strong> admin123</div>
+    </div>
+
+    <form id="adminLoginForm">
+      <div class="form-group">
+        <label class="form-label" for="loginEmail">Email Address</label>
+        <div class="input-with-icon">
+          <i class="fas fa-envelope"></i>
+          <input type="email" id="loginEmail" name="email" class="form-control" value="admin@careerlinesolution.com" required autocomplete="username">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="loginPassword">Password</label>
+        <div class="input-with-icon">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="loginPassword" name="password" class="form-control" value="admin123" required autocomplete="current-password">
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.75rem;">
+        <i class="fas fa-sign-in-alt"></i> Login to Console
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 2rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color);">
+      <a href="/" style="font-size: 0.88rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.35rem;">
+        <i class="fas fa-arrow-left"></i> Return to Public Website
+      </a>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="../js/data-store.js"></script>
+  <script src="../js/main.js"></script>
+  <script>
+    document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+
+      const origText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          localStorage.setItem('cls_admin_token', data.token);
+          localStorage.setItem('cls_admin_user', JSON.stringify(data.user));
+          showToast('Login successful! Redirecting to Dashboard...', 'success');
+          setTimeout(() => {
+            window.location.href = '/admin';
+          }, 800);
+        } else {
+          showToast(data.message || 'Login failed', 'error');
+        }
+      } catch (err) {
+        showToast('Network error while connecting to server', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = origText;
+      }
+    });
+
+    // If already logged in, redirect to /admin
+    if (localStorage.getItem('cls_admin_token')) {
+      fetch('/api/admin/me', {
+        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('cls_admin_token') }
+      }).then(r => r.json()).then(res => {
+        if (res.success) {
+          window.location.href = '/admin';
+        }
+      }).catch(() => {});
+    }
+  </script>
+</body>
+</html>

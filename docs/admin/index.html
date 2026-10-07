@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | CareerLine Solution</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230B2C66'/><path d='M30 70 L50 30 L70 70 Z' fill='%23C89B3C'/></svg>">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body class="admin-body">
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="admin-sidebar-brand">
+      <div style="width: 38px; height: 38px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.25rem;">
+        <i class="fas fa-briefcase"></i>
+      </div>
+      <div>
+        <div style="font-weight: 800; font-size: 1.15rem; color: #FFFFFF; line-height: 1.1;">CareerLine<span style="color: var(--accent);">Solution</span></div>
+        <div style="font-size: 0.65rem; color: #94A3B8; text-transform: uppercase; letter-spacing: 1px;">Admin Console</div>
+      </div>
+    </div>
+
+    <ul class="admin-nav-list">
+      <li class="admin-nav-item">
+        <a class="admin-nav-link active" onclick="switchAdminTab('dashboard')">
+          <i class="fas fa-chart-pie"></i> Dashboard Overview
+        </a>
+      </li>
+      <li class="admin-nav-item">
+        <a class="admin-nav-link" onclick="switchAdminTab('jobs')">
+          <i class="fas fa-briefcase"></i> Job Openings
+        </a>
+      </li>
+      <li class="admin-nav-item">
+        <a class="admin-nav-link" onclick="switchAdminTab('applications')">
+          <i class="fas fa-user-graduate"></i> Candidates & Resumes
+          <span class="admin-nav-badge" id="sidebarNewAppsCount">0</span>
+        </a>
+      </li>
+      <li class="admin-nav-item">
+        <a class="admin-nav-link" onclick="switchAdminTab('employers')">
+          <i class="fas fa-building"></i> Employer Requests
+          <span class="admin-nav-badge" id="sidebarNewReqsCount" style="background: var(--warning);">0</span>
+        </a>
+      </li>
+      <li class="admin-nav-item">
+        <a class="admin-nav-link" onclick="switchAdminTab('inquiries')">
+          <i class="fas fa-envelope-open-text"></i> Contact Inquiries
+        </a>
+      </li>
+      <li class="admin-nav-item">
+        <a class="admin-nav-link" onclick="switchAdminTab('users')">
+          <i class="fas fa-users-cog"></i> User Management
+        </a>
+      </li>
+      <li class="admin-nav-item">
+        <a class="admin-nav-link" onclick="switchAdminTab('settings')">
+          <i class="fas fa-cog"></i> Website Settings
+        </a>
+      </li>
+    </ul>
+
+    <div class="admin-sidebar-user">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: var(--primary); font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;" id="userAvatarLetter">
+          A
+        </div>
+        <div>
+          <div style="font-size: 0.85rem; font-weight: 600; color: #FFFFFF;" id="sidebarUserName">Administrator</div>
+          <div style="font-size: 0.7rem; color: #94A3B8;" id="sidebarUserRole">Super Admin</div>
+        </div>
+      </div>
+      <button onclick="adminLogout()" style="background: none; border: none; color: #EF4444; cursor: pointer; font-size: 1.1rem; padding: 4px;" title="Logout">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEW -->
+  <main class="admin-main">
+    
+    <!-- Topbar -->
+    <header class="admin-topbar">
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <button class="mobile-nav-toggle" style="display: none;" onclick="toggleAdminSidebar()"><i class="fas fa-bars"></i></button>
+        <h1 class="admin-page-title" id="adminPageTitle">Dashboard Overview</h1>
+      </div>
+
+      <div class="admin-topbar-actions">
+        <a href="/" target="_blank" class="btn btn-outline btn-sm">
+          <i class="fas fa-external-link-alt"></i> View Public Site
+        </a>
+        <button class="btn btn-primary btn-sm" onclick="openJobModal()">
+          <i class="fas fa-plus-circle"></i> Post New Job Opening
+        </button>
+      </div>
+    </header>
+
+    <div class="admin-content-body">
+
+      <!-- ==========================================
+           TAB 1: DASHBOARD OVERVIEW
+           ========================================== -->
+      <section id="tab-dashboard" class="tab-content active">
+        <!-- KPI Cards -->
+        <div class="kpi-cards-grid">
+          <div class="kpi-card">
+            <div>
+              <div class="kpi-title">Active Job Openings</div>
+              <div class="kpi-value" id="kpiActiveJobs">0</div>
+              <small style="color: var(--text-muted); font-size: 0.75rem;">Total Openings: <span id="kpiTotalJobs">0</span></small>
+            </div>
+            <div class="kpi-icon-box kpi-blue"><i class="fas fa-briefcase"></i></div>
+          </div>
+
+          <div class="kpi-card">
+            <div>
+              <div class="kpi-title">Candidate Resumes</div>
+              <div class="kpi-value" id="kpiTotalApps">0</div>
+              <small style="color: #15803D; font-size: 0.75rem;"><strong id="kpiNewApps">0</strong> New Profiles</small>
+            </div>
+            <div class="kpi-icon-box kpi-green"><i class="fas fa-file-invoice"></i></div>
+          </div>
+
+          <div class="kpi-card">
+            <div>
+              <div class="kpi-title">Employer Mandates</div>
+              <div class="kpi-value" id="kpiEmployerReqs">0</div>
+              <small style="color: #B45309; font-size: 0.75rem;"><strong id="kpiNewReqs">0</strong> New Inquiries</small>
+            </div>
+            <div class="kpi-icon-box kpi-amber"><i class="fas fa-building"></i></div>
+          </div>
+
+          <div class="kpi-card">
+            <div>
+              <div class="kpi-title">Shortlisted Talent</div>
+              <div class="kpi-value" id="kpiShortlisted">0</div>
+              <small style="color: var(--text-muted); font-size: 0.75rem;">In Interview Pipeline</small>
+            </div>
+            <div class="kpi-icon-box kpi-purple"><i class="fas fa-user-check"></i></div>
+          </div>
+        </div>
+
+        <!-- Recent Applications Table Card -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title"><i class="fas fa-clock" style="color: var(--accent);"></i> Recent Candidate Applications</h3>
+            <button class="btn btn-outline btn-sm" onclick="switchAdminTab('applications')">View All Candidates</button>
+          </div>
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Candidate</th>
+                  <th>Job Title</th>
+                  <th>Experience & CTC</th>
+                  <th>Location</th>
+                  <th>Status</th>
+                  <th>Applied On</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="dashboardRecentAppsTableBody">
+                <tr><td colspan="7" style="text-align: center;">Loading recent applications...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent Employer Inquiries -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title"><i class="fas fa-handshake" style="color: var(--accent);"></i> Recent Corporate Hiring Mandates</h3>
+            <button class="btn btn-outline btn-sm" onclick="switchAdminTab('employers')">View All Requests</button>
+          </div>
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Company</th>
+                  <th>Contact Person</th>
+                  <th>Service Type</th>
+                  <th>Positions</th>
+                  <th>Urgency</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="dashboardRecentReqsTableBody">
+                <tr><td colspan="7" style="text-align: center;">Loading employer mandates...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 2: JOB OPENINGS MANAGER
+           ========================================== -->
+      <section id="tab-jobs" class="tab-content">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+              <h3 class="admin-card-title"><i class="fas fa-briefcase" style="color: var(--accent);"></i> Manage Job Openings</h3>
+              <input type="text" id="adminJobSearch" placeholder="Search job title..." class="form-control" style="min-height: 38px; width: 220px;" oninput="loadAdminJobs()">
+              <select id="adminJobStatusFilter" class="form-control" style="min-height: 38px; width: 140px;" onchange="loadAdminJobs()">
+                <option value="All">All Status</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openJobModal()">
+              <i class="fas fa-plus"></i> Post Job Opening
+            </button>
+          </div>
+
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Job Title</th>
+                  <th>Sector</th>
+                  <th>Location</th>
+                  <th>Work Mode</th>
+                  <th>Experience</th>
+                  <th>Salary (P.A.)</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminJobsTableBody">
+                <tr><td colspan="8" style="text-align: center;">Loading jobs...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 3: CANDIDATE APPLICATIONS MANAGER
+           ========================================== -->
+      <section id="tab-applications" class="tab-content">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+              <h3 class="admin-card-title"><i class="fas fa-user-graduate" style="color: var(--accent);"></i> Candidate Applications</h3>
+              <input type="text" id="adminAppSearch" placeholder="Search by name, email, role..." class="form-control" style="min-height: 38px; width: 250px;" oninput="loadAdminApplications()">
+              <select id="adminAppStatusFilter" class="form-control" style="min-height: 38px; width: 180px;" onchange="loadAdminApplications()">
+                <option value="All">All Application Statuses</option>
+                <option value="New">New</option>
+                <option value="Shortlisted">Shortlisted</option>
+                <option value="Interview Scheduled">Interview Scheduled</option>
+                <option value="Selected">Selected</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Candidate</th>
+                  <th>Target Job</th>
+                  <th>Experience</th>
+                  <th>Current / Expected CTC</th>
+                  <th>Notice</th>
+                  <th>Resume</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminAppsTableBody">
+                <tr><td colspan="8" style="text-align: center;">Loading candidate applications...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 4: EMPLOYER REQUESTS
+           ========================================== -->
+      <section id="tab-employers" class="tab-content">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title"><i class="fas fa-building" style="color: var(--accent);"></i> Corporate Staffing Mandates</h3>
+          </div>
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Company Name</th>
+                  <th>Contact Person</th>
+                  <th>Contact Details</th>
+                  <th>Service & Positions</th>
+                  <th>Urgency</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminEmployerTableBody">
+                <tr><td colspan="7" style="text-align: center;">Loading employer requests...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 5: CONTACT INQUIRIES
+           ========================================== -->
+      <section id="tab-inquiries" class="tab-content">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title"><i class="fas fa-envelope" style="color: var(--accent);"></i> Website Inquiries</h3>
+          </div>
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>From</th>
+                  <th>Contact</th>
+                  <th>Subject</th>
+                  <th>Message</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminInquiriesTableBody">
+                <tr><td colspan="7" style="text-align: center;">Loading inquiries...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 6: USER MANAGEMENT
+           ========================================== -->
+      <section id="tab-users" class="tab-content">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title"><i class="fas fa-users-cog" style="color: var(--accent);"></i> Team & Recruiter Accounts</h3>
+            <button class="btn btn-primary btn-sm" onclick="openUserModal()">
+              <i class="fas fa-user-plus"></i> Add New Team User
+            </button>
+          </div>
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>User Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Phone</th>
+                  <th>Created At</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminUsersTableBody">
+                <tr><td colspan="6" style="text-align: center;">Loading users...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           TAB 7: WEBSITE SETTINGS
+           ========================================== -->
+      <section id="tab-settings" class="tab-content">
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <h3 class="admin-card-title"><i class="fas fa-cog" style="color: var(--accent);"></i> Company & Contact Settings</h3>
+          </div>
+          <div style="padding: 2rem;">
+            <form id="adminSettingsForm">
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="setSiteName">Company Name</label>
+                  <input type="text" id="setSiteName" name="siteName" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="setTagline">Company Tagline</label>
+                  <input type="text" id="setTagline" name="tagline" class="form-control">
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="setPhone">Primary Phone Number</label>
+                  <input type="text" id="setPhone" name="phone" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="setAltPhone">Secondary Phone Number</label>
+                  <input type="text" id="setAltPhone" name="altPhone" class="form-control">
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label class="form-label" for="setWhatsapp">WhatsApp Number (Digits with country code)</label>
+                  <input type="text" id="setWhatsapp" name="whatsapp" class="form-control" placeholder="917573905399" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="setEmail">Official Email</label>
+                  <input type="email" id="setEmail" name="email" class="form-control" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="setAddress">Head Office Address</label>
+                <textarea id="setAddress" name="address" class="form-control" rows="2"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="setBranchOffice">Branch Office Address</label>
+                <textarea id="setBranchOffice" name="branchOffice" class="form-control" rows="2"></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Save Settings
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ==========================================
+       MODAL: CREATE / EDIT JOB OPENING
+       ========================================== -->
+  <div id="jobAdminModal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 760px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="jobModalTitle"><i class="fas fa-briefcase" style="color: var(--accent);"></i> Post Job Opening</h3>
+        <button class="modal-close-btn" onclick="closeJobModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="jobAdminForm">
+          <input type="hidden" id="adminJobId" name="id">
+
+          <div class="form-group">
+            <label class="form-label" for="jobTitle">Job Title *</label>
+            <input type="text" id="jobTitle" name="title" class="form-control" placeholder="e.g. Senior Full Stack Developer" required>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="jobCategory">Sector / Category *</label>
+              <select id="jobCategory" name="category" class="form-control" required>
+                <option value="IT & Software">IT & Software</option>
+                <option value="Banking & Financial Services (BFSI)">Banking & Financial Services (BFSI)</option>
+                <option value="Manufacturing & Engineering">Manufacturing & Engineering</option>
+                <option value="Healthcare & Pharmaceuticals">Healthcare & Pharmaceuticals</option>
+                <option value="BPO / KPO / Customer Service">BPO / KPO / Customer Service</option>
+                <option value="Sales & Marketing">Sales & Marketing</option>
+                <option value="Human Resources & Staffing">Human Resources & Staffing</option>
+                <option value="Logistics & Supply Chain">Logistics & Supply Chain</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="jobCompany">Company (or Client Confidential)</label>
+              <input type="text" id="jobCompany" name="company" class="form-control" placeholder="e.g. Tier-1 MNC / Client Confidential">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="jobLocation">Location (City, State) *</label>
+              <input type="text" id="jobLocation" name="location" class="form-control" placeholder="e.g. Bengaluru, Karnataka" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="jobWorkMode">Work Mode</label>
+              <select id="jobWorkMode" name="workMode" class="form-control">
+                <option value="On-Site">On-Site</option>
+                <option value="Hybrid">Hybrid</option>
+                <option value="Remote">100% Remote</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="jobExperience">Experience Required</label>
+              <input type="text" id="jobExperience" name="experience" class="form-control" placeholder="e.g. 3 - 6 Years">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="jobSalary">Salary Bracket (P.A.)</label>
+              <input type="text" id="jobSalary" name="salary" class="form-control" placeholder="e.g. ₹12,00,000 - ₹18,00,000 P.A.">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="jobOpenings">Number of Openings</label>
+              <input type="number" id="jobOpenings" name="openings" class="form-control" value="2" min="1">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="jobStatus">Status</label>
+              <select id="jobStatus" name="status" class="form-control">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive / On Hold</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="jobSkills">Key Skills (comma separated)</label>
+            <input type="text" id="jobSkills" name="skills" class="form-control" placeholder="React, Node.js, AWS, MongoDB">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="jobDescription">Job Description</label>
+            <textarea id="jobDescription" name="description" class="form-control" rows="3" placeholder="Overview of the role..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="jobResponsibilities">Key Responsibilities</label>
+            <textarea id="jobResponsibilities" name="responsibilities" class="form-control" rows="3" placeholder="• Bullet point responsibilities..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="jobRequirements">Requirements & Qualifications</label>
+            <textarea id="jobRequirements" name="requirements" class="form-control" rows="3" placeholder="• Required educational and technical background..."></textarea>
+          </div>
+
+          <div style="display: flex; gap: 1.5rem; margin-bottom: 1.5rem;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="checkbox" id="jobUrgent" name="urgent" style="width: 18px; height: 18px;">
+              <span>Mark as <strong>Urgent Hiring</strong></span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+              <input type="checkbox" id="jobFeatured" name="featured" style="width: 18px; height: 18px;">
+              <span>Mark as <strong>Featured Job</strong></span>
+            </label>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+            <button type="button" class="btn btn-outline" onclick="closeJobModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="jobModalSubmitBtn">
+              <i class="fas fa-save"></i> Save Job Opening
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL: CANDIDATE APPLICATION DETAILS & NOTES
+       ========================================== -->
+  <div id="candidateDetailsModal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 680px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-id-card" style="color: var(--accent);"></i> Candidate Profile</h3>
+        <button class="modal-close-btn" onclick="closeCandidateModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" id="candidateModalBody">
+        <!-- Injected via admin.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL: ADD NEW ADMIN USER
+       ========================================== -->
+  <div id="userAdminModal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-user-plus" style="color: var(--accent);"></i> Add Team User</h3>
+        <button class="modal-close-btn" onclick="closeUserModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="adminUserForm">
+          <div class="form-group">
+            <label class="form-label" for="newUserName">Full Name *</label>
+            <input type="text" id="newUserName" name="name" class="form-control" placeholder="e.g. Ramesh Patel" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="newUserEmail">Email Address *</label>
+            <input type="email" id="newUserEmail" name="email" class="form-control" placeholder="ramesh@careerlinesolution.com" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="newUserPassword">Password *</label>
+            <input type="password" id="newUserPassword" name="password" class="form-control" placeholder="Minimum 6 characters" minlength="6" required>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="newUserRole">Role</label>
+              <select id="newUserRole" name="role" class="form-control">
+                <option value="Recruiter">Recruiter</option>
+                <option value="Admin">Admin</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="newUserPhone">Phone Number</label>
+              <input type="tel" id="newUserPhone" name="phone" class="form-control" placeholder="+91 98765 43210">
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+            <button type="button" class="btn btn-outline" onclick="closeUserModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-check"></i> Create User
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+  <script src="../js/data-store.js"></script>
+  <script src="../js/main.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

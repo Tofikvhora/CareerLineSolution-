@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pan-India Job Search & Filter | CareerLine Solution</title>
+  <meta name="description" content="Search and apply for thousands of verified Pan-India job openings across IT, Banking, Manufacturing, Healthcare, Sales, and BPO sectors. 100% Free for candidates.">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230B2C66'/><path d='M30 70 L50 30 L70 70 Z' fill='%23C89B3C'/></svg>">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Google Fonts Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  <style>
+    .popular-chip {
+      background: rgba(255, 255, 255, 0.15);
+      color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: var(--radius-full);
+      padding: 0.35rem 0.85rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .popular-chip:hover, .popular-chip.active {
+      background: var(--accent);
+      color: #071E47;
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Notification Bar -->
+  <div class="top-bar">
+    <div class="container top-bar-inner">
+      <div class="top-contact-info">
+        <a href="tel:+917573905399"><i class="fas fa-phone-alt"></i> +91 75739 05399</a>
+        <a href="mailto:info@careerlinesolution.com"><i class="fas fa-envelope"></i> info@careerlinesolution.com</a>
+        <span class="pan-india-badge"><i class="fas fa-check-circle"></i> Pan-India Verified Openings</span>
+      </div>
+      <div class="top-social-actions">
+        <a href="https://wa.me/917573905399?text=Hi%20CareerLine%20Solution,%20I%20am%20looking%20for%20a%20job." target="_blank">
+          <i class="fab fa-whatsapp" style="color: #25D366;"></i> WhatsApp Support
+        </a>
+        <a href="/admin/login" style="background: rgba(255,255,255,0.15); padding: 0.2rem 0.65rem; border-radius: 4px;">
+          <i class="fas fa-user-shield"></i> Recruiter Login
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <header class="site-header">
+    <div class="container navbar">
+      <a href="/" class="brand-logo">
+        <div class="brand-icon-box">
+          <i class="fas fa-briefcase"></i>
+        </div>
+        <div class="brand-text-wrap">
+          <div class="brand-title">CareerLine<span>Solution</span></div>
+          <div class="brand-subtitle">HR & Staffing Consultants</div>
+        </div>
+      </a>
+
+      <button class="mobile-nav-toggle" aria-label="Toggle navigation">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <ul class="nav-menu">
+        <li><a href="/" class="nav-link">Home</a></li>
+        <li><a href="/#about" class="nav-link">About Us</a></li>
+        <li><a href="/#services" class="nav-link">Services</a></li>
+        <li><a href="/#sectors" class="nav-link">Sectors</a></li>
+        <li><a href="/jobs" class="nav-link active" style="color: var(--primary); font-weight: 700;"><i class="fas fa-search"></i> Pan-India Jobs</a></li>
+        <li><a href="/#employers" class="nav-link">For Employers</a></li>
+        <li><a href="/#contact" class="nav-link">Contact</a></li>
+      </ul>
+
+      <div class="nav-cta-group">
+        <button class="btn btn-primary btn-sm" onclick="openApplyModal('general', 'General Candidate Profile')">
+          <i class="fas fa-upload"></i> Upload CV
+        </button>
+        <a href="/#employers" class="btn btn-accent btn-sm">Hire Talent</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Jobs Header Banner -->
+  <section style="background: linear-gradient(135deg, #071E47 0%, #0B2C66 60%, #123B7A 100%); color: #FFFFFF; padding: 3.5rem 0 3rem; text-align: center; position: relative;">
+    <div class="container">
+      <span class="pan-india-badge" style="margin-bottom: 0.75rem; font-size: 0.85rem;"><i class="fas fa-map-marked-alt"></i> Pan-India Openings Across 28+ States</span>
+      <h1 style="font-size: 2.6rem; color: #FFFFFF; font-weight: 800; margin-bottom: 0.75rem;">
+        Find Your Next Career Opportunity in India
+      </h1>
+      <p style="color: #CBD5E1; font-size: 1.05rem; max-width: 680px; margin: 0 auto 1.5rem;">
+        Search through verified job openings in top companies. Filter by city, industry, work mode, and experience with zero fees.
+      </p>
+
+      <!-- Popular Sector Filter Chips -->
+      <div style="display: flex; justify-content: center; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+        <span style="font-size: 0.825rem; color: #94A3B8; font-weight: 600;">Popular Sectors:</span>
+        <div id="popularSectorChips" style="display: inline-flex; gap: 0.5rem; flex-wrap: wrap;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Search & Filter Area + Jobs Grid -->
+  <section class="jobs-portal-section">
+    <div class="container">
+      
+      <!-- Search & Filter Card -->
+      <div class="search-filter-card">
+        <form id="jobsSearchFilterForm">
+          <div class="search-input-row">
+            <div class="input-with-icon">
+              <i class="fas fa-search"></i>
+              <input type="text" id="searchKeyword" placeholder="Job Title, Skills, or Company (e.g. React, Accountant, Sales)">
+            </div>
+
+            <div class="input-with-icon">
+              <i class="fas fa-map-marker-alt"></i>
+              <select id="filterLocation">
+                <option value="All">All Locations (Pan-India)</option>
+              </select>
+            </div>
+
+            <div class="input-with-icon">
+              <i class="fas fa-industry"></i>
+              <select id="filterCategory">
+                <option value="All">All Sectors / Industries</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="height: 100%;">
+              <i class="fas fa-filter"></i> Search
+            </button>
+          </div>
+
+          <!-- Secondary Filters Row -->
+          <div class="filter-pills-row">
+            <span class="filter-label"><i class="fas fa-sliders-h"></i> Refine By:</span>
+
+            <select id="filterWorkMode" class="filter-select">
+              <option value="All">Work Mode: All</option>
+              <option value="On-Site">On-Site</option>
+              <option value="Hybrid">Hybrid</option>
+              <option value="Remote">100% Remote / WFH</option>
+            </select>
+
+            <select id="filterJobType" class="filter-select">
+              <option value="All">Job Type: All</option>
+              <option value="Full-Time">Full-Time</option>
+              <option value="Contract">Contract / Temp</option>
+              <option value="Part-Time">Part-Time</option>
+            </select>
+
+            <select id="filterExperience" class="filter-select">
+              <option value="All">Experience: Any</option>
+              <option value="0-1">Freshers (0 - 1 Yr)</option>
+              <option value="1-3">1 - 3 Years</option>
+              <option value="3-5">3 - 5 Years</option>
+              <option value="5-8">5+ Years (Mid - Senior)</option>
+            </select>
+
+            <button type="button" id="clearFiltersBtn" class="clear-filter-btn">
+              <i class="fas fa-times-circle"></i> Reset Filters
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Results Stats Header -->
+      <div class="jobs-results-info">
+        <div id="jobsFoundCount" class="jobs-results-count">
+          Showing active jobs across India...
+        </div>
+        <div>
+          <button class="btn btn-outline btn-sm" onclick="openApplyModal('general', 'General Candidate Profile')">
+            <i class="fas fa-file-upload"></i> Don't see your role? Submit CV
+          </button>
+        </div>
+      </div>
+
+      <!-- Jobs Grid Container -->
+      <div id="jobsListContainer" class="jobs-grid">
+        <!-- Rendered dynamically by jobs.js -->
+      </div>
+
+      <!-- Pagination Controls -->
+      <div id="jobsPagination"></div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================
+       MODAL 1: JOB DETAILS MODAL
+       ========================================== -->
+  <div id="jobDetailsModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-briefcase" style="color: var(--accent);"></i> Job Specifications</h3>
+        <button class="modal-close-btn" onclick="closeJobDetailsModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" id="jobDetailsBody">
+        <!-- Dynamic Content -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 2: CANDIDATE JOB APPLY FORM
+       ========================================== -->
+  <div id="applyJobModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title"><i class="fas fa-paper-plane" style="color: var(--accent);"></i> Apply For Position</h3>
+          <span id="applyJobTitleDisplay" style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;"></span>
+        </div>
+        <button class="modal-close-btn" onclick="closeApplyModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="candidateApplyForm" enctype="multipart/form-data">
+          <input type="hidden" id="applyJobId" name="jobId" value="general">
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="candFullName">Full Name *</label>
+              <input type="text" id="candFullName" name="fullName" class="form-control" placeholder="e.g. Rahul Sharma" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="candEmail">Email Address *</label>
+              <input type="email" id="candEmail" name="email" class="form-control" placeholder="name@example.com" required>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="candPhone">Mobile / Phone Number *</label>
+              <input type="tel" id="candPhone" name="phone" class="form-control" placeholder="+91 98765 43210" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="candLocation">Current City & State *</label>
+              <input type="text" id="candLocation" name="currentLocation" class="form-control" placeholder="e.g. Pune, Maharashtra" required>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="candExperience">Total Experience</label>
+              <select id="candExperience" name="experience" class="form-control">
+                <option value="Fresher / 0 Years">Fresher (0 - 6 Months)</option>
+                <option value="1 - 2 Years">1 - 2 Years</option>
+                <option value="2 - 4 Years">2 - 4 Years</option>
+                <option value="4 - 7 Years">4 - 7 Years</option>
+                <option value="7+ Years">7+ Years (Senior / Lead)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="candNoticePeriod">Notice Period</label>
+              <select id="candNoticePeriod" name="noticePeriod" class="form-control">
+                <option value="Immediate Joiner">Immediate Joiner</option>
+                <option value="15 Days">15 Days</option>
+                <option value="30 Days">30 Days</option>
+                <option value="60 Days">60 Days</option>
+                <option value="90 Days">90 Days</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="candCurrentCTC">Current CTC (P.A.)</label>
+              <input type="text" id="candCurrentCTC" name="currentCTC" class="form-control" placeholder="e.g. ₹6.5 LPA">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="candExpectedCTC">Expected CTC (P.A.)</label>
+              <input type="text" id="candExpectedCTC" name="expectedCTC" class="form-control" placeholder="e.g. ₹9.0 LPA">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="candSkills">Key Technical / Functional Skills</label>
+            <input type="text" id="candSkills" name="skills" class="form-control" placeholder="e.g. React, Node.js, SQL, Java, Sales, Banking">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Upload Resume / Curriculum Vitae (PDF / DOCX)</label>
+            <label class="file-upload-box" for="candidateResume">
+              <div class="file-upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+              <div style="font-weight: 600; color: var(--primary);">Click to select or drag and drop your Resume</div>
+              <div id="fileUploadStatus" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">PDF, DOC, DOCX up to 10MB</div>
+              <input type="file" id="candidateResume" name="resume" accept=".pdf,.doc,.docx" style="display: none;">
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="candCoverNote">Cover Note / Remarks (Optional)</label>
+            <textarea id="candCoverNote" name="coverNote" class="form-control" rows="2" placeholder="Brief note to the recruiter..."></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+            <button type="button" class="btn btn-outline" onclick="closeApplyModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-paper-plane"></i> Submit Application
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-bottom" style="border: none; padding-top: 0;">
+      <div>
+        © 2026 <strong>CareerLine Solution</strong>. Pan-India HR & Recruitment Consultancy.
+      </div>
+      <div>
+        <a href="/">Home</a> • <a href="/jobs">Jobs Portal</a> • <a href="/#employers">Hire Talent</a> • <a href="/admin/login">Recruiter Portal</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating WhatsApp & Call Buttons -->
+  <div class="floating-actions">
+    <a href="https://wa.me/917573905399?text=Hi%20CareerLine%20Solution,%20I%20am%20interested%20in%20your%20services.%20Kindly%20connect." 
+       class="float-btn float-whatsapp" 
+       target="_blank" 
+       aria-label="Chat on WhatsApp">
+      <i class="fab fa-whatsapp"></i>
+    </a>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/data-store.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/jobs.js"></script>
+</body>
+</html>

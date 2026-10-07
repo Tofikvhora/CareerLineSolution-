@@ -1,0 +1,7 @@
+node_modules/
+.env
+uploads/resumes/*
+!uploads/resumes/.gitkeep
+database/*.tmp
+.DS_Store
+Thumbs.db
