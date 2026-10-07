@@ -246,4 +246,103 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Load dynamic active jobs on homepage
+  loadHomepageFeaturedJobs();
 });
+
+// Load real active jobs dynamically from server
+async function loadHomepageFeaturedJobs() {
+  const container = document.getElementById('featuredJobsPreviewContainer');
+  if (!container) return;
+
+  try {
+    const res = await fetch('/api/jobs?limit=6');
+    const data = await res.json();
+
+    if (data.success && data.jobs && data.jobs.length > 0) {
+      container.innerHTML = data.jobs.map(job => {
+        const urgentBadge = job.urgent ? `<span class="job-badge-tag badge-urgent"><i class="fas fa-bolt"></i> Urgent Hiring</span>` : '';
+        const modeBadge = job.workMode ? `<span class="job-badge-tag badge-mode">${escapeHtml(job.workMode)}</span>` : '';
+        const skillsChips = (job.skills || []).slice(0, 4).map(s => `<span class="skill-chip">${escapeHtml(s)}</span>`).join('');
+        const salaryDisplay = job.salary ? (isNaN(job.salary) ? escapeHtml(job.salary) : '₹' + Number(job.salary).toLocaleString('en-IN')) : 'Negotiable';
+
+        return `
+          <div class="job-card">
+            <div class="job-card-header">
+              <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                ${urgentBadge}
+                ${modeBadge}
+              </div>
+              <span style="font-size: 0.75rem; color: var(--text-light);"><i class="far fa-clock"></i> ${formatRelativeTime(job.createdAt)}</span>
+            </div>
+
+            <h3 class="job-title">${escapeHtml(job.title)}</h3>
+            <div class="job-company">
+              <i class="far fa-building"></i> ${escapeHtml(job.company || 'Client Confidential')} • <span style="color: var(--primary); font-weight: 600;">${escapeHtml(job.category)}</span>
+            </div>
+
+            <div class="job-meta-row">
+              <span class="job-meta-item"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(job.location)}</span>
+              <span class="job-meta-item"><i class="fas fa-briefcase"></i> ${escapeHtml(job.experience)} Yrs</span>
+              <span class="job-meta-item"><i class="fas fa-user-friends"></i> ${job.openings || 1} Openings</span>
+            </div>
+
+            <div class="job-skills-wrap">
+              ${skillsChips}
+            </div>
+
+            <div class="job-card-footer">
+              <div class="job-salary-text">
+                ${salaryDisplay}
+              </div>
+              <div class="job-actions-btn-group">
+                <a href="jobs.html?q=${encodeURIComponent(job.title)}" class="btn btn-primary btn-sm">
+                  View & Apply
+                </a>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } else {
+      container.innerHTML = `
+        <div style="grid-column: 1 / -1; background: #FFFFFF; border-radius: 12px; padding: 3rem 2rem; text-align: center; border: 1px solid var(--border-color);">
+          <div style="width: 60px; height: 60px; border-radius: 50%; background: #EFF6FF; color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.75rem; margin: 0 auto 1.25rem;">
+            <i class="fas fa-briefcase"></i>
+          </div>
+          <h3 style="color: var(--primary); margin-bottom: 0.5rem;">New Openings Coming Soon</h3>
+          <p style="color: var(--text-muted); max-width: 480px; margin: 0 auto 1.25rem;">
+            Our recruitment consultants are actively onboarding verified employer mandates. Upload your CV to be notified immediately.
+          </p>
+          <a href="jobs.html" class="btn btn-primary btn-sm">
+            <i class="fas fa-upload"></i> Upload CV
+          </a>
+        </div>
+      `;
+    }
+  } catch (err) {
+    console.error('Error loading featured jobs:', err);
+  }
+}
+
+// Helpers
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function formatRelativeTime(dateStr) {
+  if (!dateStr) return 'Recently';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const days = Math.floor(diff / 86400000);
+  if (days <= 0) return 'Today';
+  if (days === 1) return 'Yesterday';
+  if (days < 30) return `${days} days ago`;
+  return '1 month ago';
+}

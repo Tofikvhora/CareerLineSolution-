@@ -534,74 +534,11 @@
         <p class="section-desc">Apply directly in under 60 seconds. Our recruitment team reviews every submitted profile.</p>
       </div>
 
-      <!-- Quick Jobs Container -->
+      <!-- Quick Jobs Container (Dynamically rendered from active database openings) -->
       <div class="jobs-grid" id="featuredJobsPreviewContainer">
-        <!-- Will be populated via JS or default static cards -->
-        <div class="job-card">
-          <div class="job-card-header">
-            <span class="job-badge-tag badge-urgent"><i class="fas fa-bolt"></i> Urgent Hiring</span>
-            <span class="job-badge-tag badge-mode">Hybrid</span>
-          </div>
-          <h3 class="job-title">Senior Full Stack Developer (React & Node.js)</h3>
-          <div class="job-company"><i class="far fa-building"></i> Tier-1 IT Tech Firm • IT & Software</div>
-          <div class="job-meta-row">
-            <span class="job-meta-item"><i class="fas fa-map-marker-alt"></i> Bengaluru, Karnataka</span>
-            <span class="job-meta-item"><i class="fas fa-briefcase"></i> 4 - 7 Years</span>
-          </div>
-          <div class="job-skills-wrap">
-            <span class="skill-chip">React.js</span>
-            <span class="skill-chip">Node.js</span>
-            <span class="skill-chip">TypeScript</span>
-            <span class="skill-chip">AWS</span>
-          </div>
-          <div class="job-card-footer">
-            <div class="job-salary-text">₹14,00,000 - ₹22,00,000 P.A.</div>
-            <a href="jobs.html?q=Developer" class="btn btn-primary btn-sm">View & Apply</a>
-          </div>
-        </div>
-
-        <div class="job-card">
-          <div class="job-card-header">
-            <span class="job-badge-tag badge-featured"><i class="fas fa-star"></i> Featured</span>
-            <span class="job-badge-tag badge-mode">On-Site</span>
-          </div>
-          <h3 class="job-title">Branch Relationship Manager - Retail Banking</h3>
-          <div class="job-company"><i class="far fa-building"></i> Leading Private Sector Bank • BFSI</div>
-          <div class="job-meta-row">
-            <span class="job-meta-item"><i class="fas fa-map-marker-alt"></i> Mumbai, Maharashtra</span>
-            <span class="job-meta-item"><i class="fas fa-briefcase"></i> 3 - 6 Years</span>
-          </div>
-          <div class="job-skills-wrap">
-            <span class="skill-chip">HNI Banking</span>
-            <span class="skill-chip">Wealth Management</span>
-            <span class="skill-chip">Mutual Funds</span>
-          </div>
-          <div class="job-card-footer">
-            <div class="job-salary-text">₹7,50,000 - ₹12,00,000 P.A.</div>
-            <a href="jobs.html?q=Banking" class="btn btn-primary btn-sm">View & Apply</a>
-          </div>
-        </div>
-
-        <div class="job-card">
-          <div class="job-card-header">
-            <span class="job-badge-tag badge-urgent"><i class="fas fa-bolt"></i> Urgent Hiring</span>
-            <span class="job-badge-tag badge-mode">Hybrid</span>
-          </div>
-          <h3 class="job-title">International BPO Customer Success Specialist</h3>
-          <div class="job-company"><i class="far fa-building"></i> Global Customer Operations • BPO / KPO</div>
-          <div class="job-meta-row">
-            <span class="job-meta-item"><i class="fas fa-map-marker-alt"></i> Gurugram / Delhi NCR</span>
-            <span class="job-meta-item"><i class="fas fa-briefcase"></i> 1 - 3 Years</span>
-          </div>
-          <div class="job-skills-wrap">
-            <span class="skill-chip">Fluent English</span>
-            <span class="skill-chip">Zendesk</span>
-            <span class="skill-chip">Customer Support</span>
-          </div>
-          <div class="job-card-footer">
-            <div class="job-salary-text">₹4,50,000 - ₹6,50,000 P.A.</div>
-            <a href="jobs.html?q=BPO" class="btn btn-primary btn-sm">View & Apply</a>
-          </div>
+        <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 0;">
+          <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary);"></i>
+          <p style="margin-top: 0.75rem; color: var(--text-muted); font-size: 0.95rem;">Loading active job openings...</p>
         </div>
       </div>
 
