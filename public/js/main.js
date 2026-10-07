@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (location && location !== 'All') params.append('location', location);
       if (category && category !== 'All') params.append('category', category);
 
-      window.location.href = `/jobs?${params.toString()}`;
+      window.location.href = `jobs.html?${params.toString()}`;
     });
   }
 

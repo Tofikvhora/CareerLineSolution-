@@ -19,7 +19,7 @@ let cachedUsers = [];
 // Initialize Admin Console
 document.addEventListener('DOMContentLoaded', async () => {
   if (!adminToken) {
-    window.location.href = '/admin/login';
+    window.location.href = 'login.html';
     return;
   }
 
@@ -76,7 +76,7 @@ async function adminFetch(url, options = {}) {
 function adminLogout() {
   localStorage.removeItem('cls_admin_token');
   localStorage.removeItem('cls_admin_user');
-  window.location.href = '/admin/login';
+  window.location.href = 'login.html';
 }
 
 // Navigation Tab Switcher
