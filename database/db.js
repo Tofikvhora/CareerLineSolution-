@@ -351,19 +351,20 @@ function initDefaultData() {
     settings: {
       siteName: 'CareerLine Solution',
       tagline: 'Premier Pan-India HR & Recruitment Consultancy',
-      phone: '+91 7573905399',
-      altPhone: '+91 9274356988',
-      whatsapp: '917573905399',
+      phone: '+91 9601874036',
+      altPhone: '+91 9601874036',
+      whatsapp: '9601874036',
       email: 'info@careerlinesolution.com',
-      address: '209 Marcelo, opp Shayam Mandir, VIP Road, Vesu, Surat, Gujarat - 395007',
-      branchOffice: 'First Floor, Orbit Business Hub, Radhanpur Cross Road, Mehsana, Gujarat - 384002',
+      address: 'Sarkhej Jambu wala No delo Ahmedabad India 382210',
+      branchOffice: 'Sarkhej Jambu wala No delo Ahmedabad India 382210',
       panIndiaReach: 'Mumbai, Delhi-NCR, Bengaluru, Hyderabad, Pune, Chennai, Kolkata, Ahmedabad, Surat, Jaipur, Indore, Chandigarh',
       stats: {
         placements: '15,000+',
         clients: '500+',
         database: '1,50,000+',
         industries: '25+'
-      }
+      },
+      customSettings: []
     }
   };
 

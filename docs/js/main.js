@@ -51,6 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeMobileNav() {
     if (navMenu) navMenu.classList.remove('open');
     if (backdrop) backdrop.classList.remove('open');
+    document.body.classList.remove('menu-open');
+    document.body.style.overflow = '';
     if (toggleBtn) {
       const icon = toggleBtn.querySelector('i');
       if (icon) {
@@ -63,6 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function openMobileNav() {
     if (navMenu) navMenu.classList.add('open');
     if (backdrop) backdrop.classList.add('open');
+    document.body.classList.add('menu-open');
+    document.body.style.overflow = 'hidden';
     if (toggleBtn) {
       const icon = toggleBtn.querySelector('i');
       if (icon) {
@@ -247,6 +251,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Load and apply dynamic website settings across public site
+  loadAndApplySiteSettings();
+
   // Load dynamic active jobs on homepage
   loadHomepageFeaturedJobs();
 });
@@ -346,3 +353,367 @@ function formatRelativeTime(dateStr) {
   if (days < 30) return `${days} days ago`;
   return '1 month ago';
 }
+
+// ==========================================
+// DYNAMIC WEBSITE SETTINGS LOADER & APPLIER
+// ==========================================
+async function loadAndApplySiteSettings() {
+  // Never run public DOM manipulations inside the admin panel!
+  if (window.location.pathname.includes('/admin') || document.querySelector('.admin-sidebar, .admin-main')) {
+    return;
+  }
+
+  // Immediate pre-render if client store has settings (eliminates flicker)
+  if (window.CareerStore && typeof window.CareerStore.getSettings === 'function') {
+    try {
+      const preSettings = window.CareerStore.getSettings();
+      if (preSettings) applySettingsToDOM(preSettings);
+    } catch (e) {}
+  }
+
+  try {
+    const res = await fetch('/api/settings');
+    const data = await res.json();
+    if (data.success && data.settings) {
+      applySettingsToDOM(data.settings);
+      if (window.CareerStore && typeof window.CareerStore.saveSettings === 'function') {
+        window.CareerStore.saveSettings(data.settings);
+      }
+    }
+  } catch (err) {
+    if (window.CareerStore && typeof window.CareerStore.getSettings === 'function') {
+      try {
+        const fallbackSettings = window.CareerStore.getSettings();
+        if (fallbackSettings) applySettingsToDOM(fallbackSettings);
+      } catch (e) {}
+    }
+    console.warn('Could not load dynamic website settings:', err);
+  }
+}
+
+function applySettingsToDOM(settings) {
+  if (!settings) return;
+
+  const phone = (settings.phone || '').trim();
+  const altPhone = (settings.altPhone || '').trim();
+  const email = (settings.email || '').trim();
+  const address = (settings.address || '').trim();
+  const branchOffice = (settings.branchOffice || '').trim();
+  const siteName = (settings.siteName || '').trim();
+  const tagline = (settings.tagline || '').trim();
+  let whatsapp = (settings.whatsapp || '').trim();
+
+  // Sanitize phone for tel: protocol
+  const cleanPhone = phone.replace(/[^0-9+]/g, '');
+  const cleanAltPhone = altPhone.replace(/[^0-9+]/g, '');
+
+  // Sanitize WhatsApp for wa.me URL
+  let waDigits = whatsapp.replace(/[^0-9]/g, '');
+  if (waDigits.length === 10) {
+    waDigits = '91' + waDigits; // Default India prefix
+  }
+
+  // 1. Company Name & Tagline updates across navbar, drawer, hero, footer, and page title
+  if (siteName) {
+    const brandHtml = formatBrandHtml(siteName);
+
+    // Navbar & Mobile drawer brand titles
+    document.querySelectorAll('.brand-title').forEach(el => {
+      el.innerHTML = brandHtml;
+    });
+
+    // Footer brand title
+    document.querySelectorAll('.footer-brand h3, .footer-brand-title').forEach(el => {
+      el.innerHTML = brandHtml;
+    });
+
+    // Footer copyright strong tag
+    document.querySelectorAll('.footer-bottom').forEach(fb => {
+      fb.querySelectorAll('strong').forEach(str => {
+        str.textContent = siteName;
+      });
+    });
+
+    // Document title
+    if (document.title.includes('CareerLine Solution')) {
+      document.title = document.title.replace(/CareerLine\s*Solution/gi, siteName);
+    } else if (!document.title.includes(siteName)) {
+      document.title = `${siteName} | ${tagline || 'HR & Recruitment Consultancy'}`;
+    }
+
+    // Hero subtitle text mention
+    const heroSubtitle = document.querySelector('.hero-subtitle');
+    if (heroSubtitle) {
+      heroSubtitle.innerHTML = heroSubtitle.innerHTML.replace(/CareerLine\s*Solution/gi, escapeHtml(siteName));
+    }
+
+    // Contact placeholder
+    const contactMsg = document.getElementById('contactMessage');
+    if (contactMsg) {
+      contactMsg.placeholder = `How can ${siteName} help you?`;
+    }
+  }
+
+  if (tagline) {
+    // Navbar & Mobile drawer subtitles
+    document.querySelectorAll('.brand-subtitle').forEach(el => {
+      el.textContent = tagline;
+    });
+
+    // Hero badge
+    const heroBadge = document.querySelector('.hero-badge');
+    if (heroBadge) {
+      heroBadge.innerHTML = `<i class="fas fa-check-circle"></i> ${escapeHtml(tagline)}`;
+    }
+  }
+
+  // 2. Elements with explicit data-setting attribute
+  document.querySelectorAll('[data-setting]').forEach(el => {
+    // Floating buttons must NEVER have inner text changed!
+    if (el.classList.contains('float-btn') || el.closest('.floating-actions')) {
+      return;
+    }
+
+    const key = el.getAttribute('data-setting');
+    if (key === 'siteName') {
+      if (el.classList.contains('brand-title') || el.tagName === 'H3') {
+        el.innerHTML = formatBrandHtml(siteName);
+      } else {
+        el.textContent = siteName;
+      }
+    } else if (key === 'tagline') {
+      el.textContent = tagline;
+    } else if (key === 'phone') {
+      if (el.tagName === 'A') {
+        el.href = `tel:${cleanPhone}`;
+        updateLinkTextPreservingIcon(el, phone);
+      } else {
+        el.textContent = phone;
+      }
+    } else if (key === 'altPhone') {
+      if (el.tagName === 'A') {
+        el.href = `tel:${cleanAltPhone}`;
+        updateLinkTextPreservingIcon(el, altPhone);
+      } else {
+        el.textContent = altPhone;
+      }
+    } else if (key === 'email') {
+      if (el.tagName === 'A') {
+        el.href = `mailto:${email}`;
+        updateLinkTextPreservingIcon(el, email);
+      } else {
+        el.textContent = email;
+      }
+    } else if (key === 'whatsapp') {
+      if (el.tagName === 'A') {
+        const textParam = el.getAttribute('data-wa-text') || `Hi ${siteName || 'CareerLine Solution'}, I am looking for recruitment support`;
+        el.href = `https://wa.me/${waDigits}?text=${encodeURIComponent(textParam)}`;
+      } else {
+        el.textContent = whatsapp;
+      }
+    } else if (key === 'address') {
+      el.textContent = address;
+    } else if (key === 'branchOffice') {
+      el.textContent = branchOffice;
+    } else if (key === 'combinedPhones') {
+      el.textContent = `${phone}${altPhone && altPhone !== phone ? ' / ' + altPhone : ''}`;
+    }
+  });
+
+  // 2. Generic Top Bar Updates across all pages
+  const topBar = document.querySelector('.top-bar');
+  if (topBar) {
+    const topPhoneLinks = topBar.querySelectorAll('a[href^="tel:"]');
+    if (topPhoneLinks.length > 0 && phone) {
+      topPhoneLinks[0].href = `tel:${cleanPhone}`;
+      updateLinkTextPreservingIcon(topPhoneLinks[0], phone);
+    }
+    if (topPhoneLinks.length > 1 && altPhone) {
+      topPhoneLinks[1].href = `tel:${cleanAltPhone}`;
+      updateLinkTextPreservingIcon(topPhoneLinks[1], altPhone);
+    }
+
+    const topEmailLink = topBar.querySelector('a[href^="mailto:"]');
+    if (topEmailLink && email) {
+      topEmailLink.href = `mailto:${email}`;
+      updateLinkTextPreservingIcon(topEmailLink, email);
+    }
+
+    const topWaLink = topBar.querySelector('a[href*="wa.me"]');
+    if (topWaLink && waDigits) {
+      topWaLink.href = `https://wa.me/${waDigits}?text=${encodeURIComponent(`Hi ${siteName || 'CareerLine Solution'}, I am looking for recruitment support`)}`;
+    }
+  }
+
+  // 3. Floating Action Buttons (WhatsApp & Phone call) - ONLY icons, NEVER text!
+  const floatWa = document.querySelector('.float-btn.float-whatsapp, .floating-actions a[href*="wa.me"]');
+  if (floatWa) {
+    if (waDigits) {
+      floatWa.href = `https://wa.me/${waDigits}?text=${encodeURIComponent(`Hi ${siteName || 'CareerLine Solution'}, I am interested in your services. Kindly connect.`)}`;
+    }
+    floatWa.setAttribute('aria-label', 'Chat on WhatsApp');
+    const icon = floatWa.querySelector('i');
+    if (icon) {
+      floatWa.innerHTML = '';
+      floatWa.appendChild(icon);
+    }
+  }
+
+  const floatCall = document.querySelector('.float-btn.float-call, .floating-actions a[href^="tel:"]');
+  if (floatCall) {
+    if (cleanPhone) {
+      floatCall.href = `tel:${cleanPhone}`;
+    }
+    floatCall.setAttribute('aria-label', `Call ${siteName || 'CareerLine Solution'}`);
+    const icon = floatCall.querySelector('i');
+    if (icon) {
+      floatCall.innerHTML = '';
+      floatCall.appendChild(icon);
+    }
+  }
+
+  // 4. Any other regular WhatsApp links across the page
+  if (waDigits) {
+    document.querySelectorAll('a[href*="wa.me"]').forEach(link => {
+      if (link.classList.contains('float-btn') || link.closest('.floating-actions')) return;
+      try {
+        const url = new URL(link.href);
+        const textParam = url.searchParams.get('text') || '';
+        link.href = `https://wa.me/${waDigits}${textParam ? '?text=' + encodeURIComponent(textParam) : ''}`;
+      } catch (e) {
+        link.href = `https://wa.me/${waDigits}`;
+      }
+    });
+  }
+
+  // 5. Contact Cards Grid (Homepage and Contact page)
+  const contactCards = document.querySelectorAll('.contact-card');
+  contactCards.forEach(card => {
+    // Phone card
+    const phoneLinks = card.querySelectorAll('a[href^="tel:"]');
+    if (phoneLinks.length > 0 && phone) {
+      phoneLinks[0].href = `tel:${cleanPhone}`;
+      phoneLinks[0].textContent = phone;
+    }
+    if (phoneLinks.length > 1 && altPhone) {
+      phoneLinks[1].href = `tel:${cleanAltPhone}`;
+      phoneLinks[1].textContent = altPhone;
+    }
+
+    // Email card
+    const emailLinks = card.querySelectorAll('a[href^="mailto:"]');
+    if (emailLinks.length > 0 && email) {
+      emailLinks[0].href = `mailto:${email}`;
+      emailLinks[0].textContent = email;
+    }
+
+    // Address card (contains map marker)
+    if (card.querySelector('.fa-map-marker-alt')) {
+      const pTags = card.querySelectorAll('p');
+      if (pTags.length > 0 && address) {
+        pTags[0].innerHTML = `<strong>Head Office:</strong> ${escapeHtml(address)}`;
+      }
+      if (pTags.length > 1 && branchOffice) {
+        pTags[1].innerHTML = `<strong>Branch Office:</strong> ${escapeHtml(branchOffice)}`;
+      }
+    }
+  });
+
+  // 6. Footer Updates
+  const footer = document.querySelector('.site-footer');
+  if (footer) {
+    const footerAddress = footer.querySelector('.footer-contact-list li:has(.fa-map-marker-alt) div, .footer-contact-list li i.fa-map-marker-alt + div');
+    if (footerAddress && address) {
+      footerAddress.innerHTML = `<strong>Head Office:</strong> ${escapeHtml(address)}${branchOffice && branchOffice !== address ? `<br><strong style="font-size:0.85rem;color:var(--text-light,#94A3B8);">Branch:</strong> <span style="font-size:0.85rem;">${escapeHtml(branchOffice)}</span>` : ''}`;
+    }
+
+    const footerPhone = footer.querySelector('.footer-contact-list li:has(.fa-phone-alt) div, .footer-contact-list li i.fa-phone-alt + div');
+    if (footerPhone && phone) {
+      footerPhone.textContent = `${phone}${altPhone && altPhone !== phone ? ' / ' + altPhone : ''}`;
+    }
+
+    const footerEmail = footer.querySelector('.footer-contact-list li:has(.fa-envelope) div, .footer-contact-list li i.fa-envelope + div');
+    if (footerEmail && email) {
+      footerEmail.textContent = email;
+    }
+
+    const footerCopyright = footer.querySelector('.footer-bottom div:first-child');
+    if (footerCopyright && siteName) {
+      footerCopyright.innerHTML = `© ${new Date().getFullYear()} <strong>${escapeHtml(siteName)}</strong>. All Rights Reserved.`;
+    }
+  }
+
+  // 7. Custom Settings Rendering
+  renderCustomSettingsOnPublicSite(settings.customSettings);
+}
+
+function formatBrandHtml(name) {
+  if (!name) return 'CareerLine<span>Solution</span>';
+  const trimmed = name.trim();
+  const words = trimmed.split(/\s+/);
+  if (words.length > 1) {
+    const lastWord = words.pop();
+    return `${escapeHtml(words.join(' '))} <span>${escapeHtml(lastWord)}</span>`;
+  }
+  if (trimmed.length > 6) {
+    const mid = Math.floor(trimmed.length / 2);
+    return `${escapeHtml(trimmed.slice(0, mid))}<span>${escapeHtml(trimmed.slice(mid))}</span>`;
+  }
+  return escapeHtml(trimmed);
+}
+
+function updateLinkTextPreservingIcon(linkEl, newText) {
+  // If this is a floating button, NEVER inject text!
+  if (linkEl.classList.contains('float-btn') || linkEl.closest('.floating-actions')) {
+    return;
+  }
+  const icon = linkEl.querySelector('i');
+  if (icon) {
+    linkEl.innerHTML = '';
+    linkEl.appendChild(icon);
+    linkEl.appendChild(document.createTextNode(' ' + newText));
+  } else {
+    linkEl.textContent = newText;
+  }
+}
+
+function renderCustomSettingsOnPublicSite(customSettings) {
+  if (!customSettings || !Array.isArray(customSettings) || customSettings.length === 0) return;
+
+  // Targeted elements matching custom keys
+  customSettings.forEach(item => {
+    if (!item.key) return;
+    const key = item.key.toLowerCase().replace(/[^a-z0-9]/g, '');
+    document.querySelectorAll(`[data-setting="${key}"]`).forEach(el => {
+      el.textContent = item.value || '';
+    });
+  });
+
+  // General custom settings container display (e.g. on contact section or footer)
+  const containers = document.querySelectorAll('#publicCustomSettingsList, .public-custom-settings-wrap');
+  containers.forEach(container => {
+    container.innerHTML = `
+      <div style="background: #FFFFFF; border: 1px solid var(--border-color, #E2E8F0); border-radius: 12px; padding: 1.25rem 1.5rem; margin-top: 1.5rem; box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.06));">
+        <h4 style="font-size: 1.05rem; color: var(--primary, #0B2545); margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-info-circle" style="color: var(--accent, #FF8A00);"></i> Additional Information
+        </h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+          ${customSettings.map(s => `
+            <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; padding: 0.75rem 1rem;">
+              <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted, #64748B); margin-bottom: 0.25rem;">
+                ${escapeHtml(s.key)}
+              </div>
+              <div style="font-size: 0.925rem; font-weight: 600; color: var(--text-dark, #1E293B);">
+                ${escapeHtml(s.value)}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  });
+}
+
+// Expose on window for programmatic calls or testing
+window.loadAndApplySiteSettings = loadAndApplySiteSettings;
+window.applySettingsToDOM = applySettingsToDOM;

@@ -820,6 +820,59 @@ window.deleteUser = async function(userId) {
 // ==========================================
 // 7. WEBSITE SETTINGS
 // ==========================================
+let currentCustomSettings = [];
+
+function renderCustomSettingsList() {
+  const container = document.getElementById('customSettingsContainer');
+  if (!container) return;
+
+  if (!currentCustomSettings || currentCustomSettings.length === 0) {
+    container.innerHTML = `
+      <div style="padding: 1.25rem; background: #F8FAFC; border: 1px dashed var(--border-color); border-radius: 8px; text-align: center; color: var(--text-muted); font-size: 0.875rem;">
+        <i class="fas fa-info-circle" style="color: var(--primary);"></i> No custom settings added yet. Click <strong>"Add Custom Setting"</strong> above to add fields like Working Hours, Social Links, GSTIN, or Notice Banner.
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = currentCustomSettings.map((item, index) => `
+    <div class="custom-setting-row" style="display: flex; gap: 0.75rem; align-items: flex-end; background: #F8FAFC; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border-color); flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 140px;">
+        <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 3px; display: block;">Field / Label Name</label>
+        <input type="text" class="form-control form-control-sm custom-setting-key" placeholder="e.g. Working Hours" value="${escapeHtml(item.key || item.label || '')}" data-index="${index}" style="font-size: 0.875rem;">
+      </div>
+      <div style="flex: 2; min-width: 200px;">
+        <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 3px; display: block;">Field Value</label>
+        <input type="text" class="form-control form-control-sm custom-setting-value" placeholder="e.g. Mon-Sat: 9:30 AM - 7:00 PM" value="${escapeHtml(item.value || '')}" data-index="${index}" style="font-size: 0.875rem;">
+      </div>
+      <div style="padding-bottom: 2px;">
+        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeCustomSetting(${index})" title="Delete Setting" style="padding: 0.4rem 0.75rem;">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.removeCustomSetting = function(index) {
+  syncCustomSettingsFromDOM();
+  currentCustomSettings.splice(index, 1);
+  renderCustomSettingsList();
+};
+
+function syncCustomSettingsFromDOM() {
+  const rows = document.querySelectorAll('.custom-setting-row');
+  const updated = [];
+  rows.forEach(row => {
+    const key = row.querySelector('.custom-setting-key')?.value.trim() || '';
+    const value = row.querySelector('.custom-setting-value')?.value.trim() || '';
+    if (key || value) {
+      updated.push({ key, value });
+    }
+  });
+  currentCustomSettings = updated;
+}
+
 async function loadAdminSettings() {
   try {
     const res = await fetch('/api/settings');
@@ -834,6 +887,15 @@ async function loadAdminSettings() {
       document.getElementById('setEmail').value = s.email || '';
       document.getElementById('setAddress').value = s.address || '';
       document.getElementById('setBranchOffice').value = s.branchOffice || '';
+
+      if (Array.isArray(s.customSettings)) {
+        currentCustomSettings = [...s.customSettings];
+      } else if (s.custom && typeof s.custom === 'object') {
+        currentCustomSettings = Object.entries(s.custom).map(([k, v]) => ({ key: k, value: v }));
+      } else {
+        currentCustomSettings = [];
+      }
+      renderCustomSettingsList();
     }
   } catch (err) {
     showToast('Failed to load settings', 'error');
@@ -844,8 +906,30 @@ function bindSettingsForm() {
   const form = document.getElementById('adminSettingsForm');
   if (!form) return;
 
+  const addBtn = document.getElementById('btnAddCustomSetting');
+  if (addBtn) {
+    addBtn.addEventListener('click', () => {
+      syncCustomSettingsFromDOM();
+      currentCustomSettings.push({ key: '', value: '' });
+      renderCustomSettingsList();
+      const rows = document.querySelectorAll('.custom-setting-row');
+      if (rows.length > 0) {
+        rows[rows.length - 1].querySelector('.custom-setting-key')?.focus();
+      }
+    });
+  }
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    syncCustomSettingsFromDOM();
+
+    const saveBtn = document.getElementById('btnSaveSettings');
+    const origHtml = saveBtn ? saveBtn.innerHTML : '';
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    }
+
     const payload = {
       siteName: document.getElementById('setSiteName').value.trim(),
       tagline: document.getElementById('setTagline').value.trim(),
@@ -854,7 +938,8 @@ function bindSettingsForm() {
       whatsapp: document.getElementById('setWhatsapp').value.trim(),
       email: document.getElementById('setEmail').value.trim(),
       address: document.getElementById('setAddress').value.trim(),
-      branchOffice: document.getElementById('setBranchOffice').value.trim()
+      branchOffice: document.getElementById('setBranchOffice').value.trim(),
+      customSettings: currentCustomSettings
     };
 
     try {
@@ -863,12 +948,17 @@ function bindSettingsForm() {
         body: JSON.stringify(payload)
       });
       if (res.success) {
-        showToast('Website settings updated successfully!', 'success');
+        showToast('Website settings updated successfully! Changes are live on the public site.', 'success');
       } else {
-        showToast('Failed to save settings', 'error');
+        showToast(res.message || 'Failed to save settings', 'error');
       }
     } catch (err) {
       showToast('Error saving settings', 'error');
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = origHtml;
+      }
     }
   });
 }

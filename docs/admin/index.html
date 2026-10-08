@@ -440,9 +440,32 @@
                 <textarea id="setBranchOffice" name="branchOffice" class="form-control" rows="2"></textarea>
               </div>
 
-              <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save"></i> Save Settings
-              </button>
+              <!-- Custom Settings & Additional Information Section -->
+              <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color, #E2E8F0);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+                  <div>
+                    <h4 style="margin: 0; font-size: 1.05rem; color: var(--primary, #0B2545);">
+                      <i class="fas fa-sliders-h" style="color: var(--accent, #FF8A00); margin-right: 0.5rem;"></i> Custom Settings & Additional Information
+                    </h4>
+                    <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: var(--text-muted, #64748B);">
+                      Add custom fields (e.g., Working Hours, GST Number, Social Media Links, Notice Banner, Extra Contact) that automatically reflect on your public website.
+                    </p>
+                  </div>
+                  <button type="button" class="btn btn-outline-primary btn-sm" id="btnAddCustomSetting">
+                    <i class="fas fa-plus"></i> Add Custom Setting
+                  </button>
+                </div>
+
+                <div id="customSettingsContainer" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                  <!-- Rendered dynamically -->
+                </div>
+              </div>
+
+              <div style="margin-top: 1.5rem;">
+                <button type="submit" class="btn btn-primary" id="btnSaveSettings">
+                  <i class="fas fa-save"></i> Save Settings
+                </button>
+              </div>
             </form>
           </div>
         </div>

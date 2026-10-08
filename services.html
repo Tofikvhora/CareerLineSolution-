@@ -16,12 +16,12 @@
   <div class="top-bar">
     <div class="container top-bar-inner">
       <div class="top-contact-info">
-        <a href="tel:+917573905399"><i class="fas fa-phone-alt"></i> +91 75739 05399</a>
-        <a href="mailto:info@careerlinesolution.com"><i class="fas fa-envelope"></i> info@careerlinesolution.com</a>
+        <a href="tel:+919601874036" data-setting="phone"><i class="fas fa-phone-alt"></i> +91 9601874036</a>
+        <a href="mailto:info@careerlinesolution.com" data-setting="email"><i class="fas fa-envelope"></i> info@careerlinesolution.com</a>
         <span class="pan-india-badge"><i class="fas fa-handshake"></i> Pan-India Staffing Solutions</span>
       </div>
       <div class="top-social-actions">
-        <a href="https://wa.me/917573905399" target="_blank"><i class="fab fa-whatsapp" style="color: #25D366;"></i> WhatsApp Support</a>
+        <a href="https://wa.me/919601874036" target="_blank" data-setting="whatsapp"><i class="fab fa-whatsapp" style="color: #25D366;"></i> WhatsApp Support</a>
         <a href="admin/login.html" class="recruiter-badge-link"><i class="fas fa-user-shield"></i> Recruiter Portal</a>
       </div>
     </div>
@@ -33,8 +33,8 @@
       <a href="index.html" class="brand-logo">
         <div class="brand-icon-box"><i class="fas fa-briefcase"></i></div>
         <div class="brand-text-wrap">
-          <div class="brand-title">CareerLine<span>Solution</span></div>
-          <div class="brand-subtitle">HR & Staffing Consultants</div>
+          <div class="brand-title" data-setting="siteName">CareerLine<span>Solution</span></div>
+          <div class="brand-subtitle" data-setting="tagline">HR & Staffing Consultants</div>
         </div>
       </a>
       <button class="mobile-nav-toggle" aria-label="Toggle navigation"><i class="fas fa-bars"></i></button>
@@ -45,8 +45,8 @@
               <i class="fas fa-briefcase"></i>
             </div>
             <div class="brand-text-wrap">
-              <div class="brand-title">CareerLine<span>Solution</span></div>
-              <div class="brand-subtitle">HR &amp; Staffing Consultants</div>
+              <div class="brand-title" data-setting="siteName">CareerLine<span>Solution</span></div>
+              <div class="brand-subtitle" data-setting="tagline">HR &amp; Staffing Consultants</div>
             </div>
           </a>
           <button class="mobile-nav-toggle mobile-close-btn" aria-label="Close navigation" onclick="document.querySelector('.nav-menu').classList.remove('open'); document.body.classList.remove('menu-open');">
@@ -169,7 +169,7 @@
       <p style="color: #CBD5E1; max-width: 600px; margin: 0 auto 2rem;">Contact our recruitment advisors to discuss your hiring targets today.</p>
       <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
         <a href="employers.html" class="btn btn-accent btn-lg"><i class="fas fa-user-plus"></i> Submit Requirements</a>
-        <a href="https://wa.me/917573905399" class="btn btn-outline-white btn-lg" target="_blank"><i class="fab fa-whatsapp"></i> Chat on WhatsApp</a>
+        <a href="https://wa.me/919601874036" class="btn btn-outline-white btn-lg" target="_blank" data-setting="whatsapp"><i class="fab fa-whatsapp"></i> Chat on WhatsApp</a>
       </div>
     </div>
   </section>
@@ -177,11 +177,12 @@
   <!-- Footer -->
   <footer class="site-footer">
     <div class="container footer-bottom">
-      <div>© 2026 <strong>CareerLine Solution</strong>. All Rights Reserved.</div>
+      <div>© 2026 <strong data-setting="siteName">CareerLine Solution</strong>. All Rights Reserved.</div>
       <div><a href="index.html">Home</a> • <a href="jobs.html">Jobs</a> • <a href="contact.html">Contact</a> • <a href="admin/login.html">Admin</a></div>
     </div>
   </footer>
 
+  <script src="js/data-store.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

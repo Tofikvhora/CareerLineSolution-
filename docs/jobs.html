@@ -46,12 +46,12 @@
   <div class="top-bar">
     <div class="container top-bar-inner">
       <div class="top-contact-info">
-        <a href="tel:+917573905399"><i class="fas fa-phone-alt"></i> +91 75739 05399</a>
-        <a href="mailto:info@careerlinesolution.com"><i class="fas fa-envelope"></i> info@careerlinesolution.com</a>
+        <a href="tel:+919601874036" data-setting="phone"><i class="fas fa-phone-alt"></i> +91 9601874036</a>
+        <a href="mailto:info@careerlinesolution.com" data-setting="email"><i class="fas fa-envelope"></i> info@careerlinesolution.com</a>
         <span class="pan-india-badge"><i class="fas fa-check-circle"></i> Pan-India Verified Openings</span>
       </div>
       <div class="top-social-actions">
-        <a href="https://wa.me/917573905399?text=Hi%20CareerLine%20Solution,%20I%20am%20looking%20for%20a%20job." target="_blank">
+        <a href="https://wa.me/919601874036?text=Hi%20CareerLine%20Solution,%20I%20am%20looking%20for%20a%20job." target="_blank" data-setting="whatsapp" data-wa-text="Hi CareerLine Solution, I am looking for a job.">
           <i class="fab fa-whatsapp" style="color: #25D366;"></i> WhatsApp Support
         </a>
         <a href="admin/login.html" style="background: rgba(255,255,255,0.15); padding: 0.2rem 0.65rem; border-radius: 4px;">
@@ -69,8 +69,8 @@
           <i class="fas fa-briefcase"></i>
         </div>
         <div class="brand-text-wrap">
-          <div class="brand-title">CareerLine<span>Solution</span></div>
-          <div class="brand-subtitle">HR & Staffing Consultants</div>
+          <div class="brand-title" data-setting="siteName">CareerLine<span>Solution</span></div>
+          <div class="brand-subtitle" data-setting="tagline">HR & Staffing Consultants</div>
         </div>
       </a>
 
@@ -81,11 +81,16 @@
       <!-- Slide-out Drawer Navigation -->
       <ul class="nav-menu" id="navMenu">
         <li class="nav-menu-header">
-          <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <div class="brand-icon-box" style="width: 32px; height: 32px; font-size: 1rem;"><i class="fas fa-briefcase"></i></div>
-            <strong style="color: var(--primary); font-size: 1.05rem;">CareerLine</strong>
-          </div>
-          <button class="mobile-nav-toggle" style="background:none; border:none; width: auto; height: auto; font-size: 1.25rem; color: var(--text-dark);" onclick="document.querySelector('.nav-menu').classList.remove('open')">
+          <a href="index.html" class="brand-logo" style="text-decoration: none;">
+            <div class="brand-icon-box">
+              <i class="fas fa-briefcase"></i>
+            </div>
+            <div class="brand-text-wrap">
+              <div class="brand-title" data-setting="siteName">CareerLine<span>Solution</span></div>
+              <div class="brand-subtitle" data-setting="tagline">HR &amp; Staffing Consultants</div>
+            </div>
+          </a>
+          <button class="mobile-nav-toggle mobile-close-btn" aria-label="Close navigation" onclick="document.querySelector('.nav-menu').classList.remove('open'); document.body.classList.remove('menu-open');">
             <i class="fas fa-times"></i>
           </button>
         </li>
@@ -340,7 +345,7 @@
   <footer class="site-footer">
     <div class="container footer-bottom" style="border: none; padding-top: 0;">
       <div>
-        © 2026 <strong>CareerLine Solution</strong>. Pan-India HR & Recruitment Consultancy.
+        © 2026 <strong data-setting="siteName">CareerLine Solution</strong>. Pan-India HR & Recruitment Consultancy.
       </div>
       <div>
         <a href="index.html">Home</a> • <a href="jobs.html">Jobs Portal</a> • <a href="employers.html">Hire Talent</a> • <a href="admin/login.html">Recruiter Portal</a>
@@ -350,11 +355,16 @@
 
   <!-- Floating WhatsApp & Call Buttons -->
   <div class="floating-actions">
-    <a href="https://wa.me/917573905399?text=Hi%20CareerLine%20Solution,%20I%20am%20interested%20in%20your%20services.%20Kindly%20connect." 
+    <a href="https://wa.me/919601874036?text=Hi%20CareerLine%20Solution,%20I%20am%20interested%20in%20your%20services.%20Kindly%20connect." 
        class="float-btn float-whatsapp" 
        target="_blank" 
        aria-label="Chat on WhatsApp">
       <i class="fab fa-whatsapp"></i>
+    </a>
+    <a href="tel:+919601874036" 
+       class="float-btn float-call" 
+       aria-label="Call CareerLine Solution">
+      <i class="fas fa-phone-alt"></i>
     </a>
   </div>
 

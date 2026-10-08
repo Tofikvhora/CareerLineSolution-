@@ -156,23 +156,34 @@
       }
     ],
     settings: {
-      siteName: 'CareerLine Solution',
-      tagline: 'Premier Pan-India HR & Recruitment Consultancy',
-      phone: '+91 7573905399',
-      altPhone: '+91 9274356988',
-      whatsapp: '917573905399',
+      siteName: 'CareerLine Solutions',
+      tagline: 'Tofik vora',
+      phone: '+91 9601874036',
+      altPhone: '+91 9601874036',
+      whatsapp: '9601874036',
       email: 'info@careerlinesolution.com',
-      address: '209 Marcelo, opp Shayam Mandir, VIP Road, Vesu, Surat, Gujarat - 395007',
-      branchOffice: 'First Floor, Orbit Business Hub, Radhanpur Cross Road, Mehsana, Gujarat - 384002'
+      address: 'Sarkhej Jambu wala No delo Ahmedabad India 382210',
+      branchOffice: 'Sarkhej Jambu wala No delo Ahmedabad India 382210',
+      panIndiaReach: 'Mumbai, Delhi-NCR, Bengaluru, Hyderabad, Pune, Chennai, Kolkata, Ahmedabad, Surat, Jaipur, Indore, Chandigarh',
+      customSettings: [
+        {
+          key: 'Working Hours',
+          value: 'Mon - Sat: 9:30 AM - 7:00 PM'
+        },
+        {
+          key: 'Notice',
+          value: 'New Job in IT'
+        }
+      ]
     }
   };
 
   // Get or initialize storage
   function getDB() {
     const version = localStorage.getItem('cls_db_version');
-    if (version !== 'v3') {
+    if (version !== 'v5') {
       localStorage.removeItem('cls_local_database');
-      localStorage.setItem('cls_db_version', 'v3');
+      localStorage.setItem('cls_db_version', 'v5');
     }
     let raw = localStorage.getItem('cls_local_database');
     if (!raw) {
@@ -578,7 +589,34 @@
       return mockJson({ success: true, message: 'User deleted' });
     }
 
+    // 24. PUT /api/admin/settings
+    if (pathname === '/api/admin/settings' && (method === 'PUT' || method === 'POST')) {
+      const body = typeof options.body === 'string' ? JSON.parse(options.body) : (options.body || {});
+      db.settings = {
+        ...(db.settings || {}),
+        ...body
+      };
+      saveDB(db);
+      return mockJson({
+        success: true,
+        message: 'Settings updated successfully.',
+        settings: db.settings
+      });
+    }
+
     // Default fallback
     return mockJson({ success: true, message: 'Action simulated in static mode' });
+  };
+
+  window.CareerStore = {
+    getDB,
+    saveDB,
+    getSettings: () => getDB().settings,
+    saveSettings: (settings) => {
+      const db = getDB();
+      db.settings = { ...(db.settings || {}), ...settings };
+      saveDB(db);
+      return db.settings;
+    }
   };
 })();
