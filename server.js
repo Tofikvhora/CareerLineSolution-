@@ -659,7 +659,16 @@ app.get('/api/admin/applications/export', authenticateAdmin, (req, res) => {
   const baseUrl = req.protocol + '://' + req.get('host');
 
   const rows = apps.map(app => {
-    let resumeUrl = app.resumeUrl ? (app.resumeUrl.startsWith('http') ? app.resumeUrl : baseUrl + app.resumeUrl) : 'No File Uploaded';
+    let resumeUrl = 'No File Uploaded';
+    if (app.resumeUrl) {
+      if (app.resumeUrl.startsWith('data:')) {
+        resumeUrl = 'Attached in Admin Portal (Download CV / ZIP)';
+      } else if (app.resumeUrl.startsWith('http')) {
+        resumeUrl = app.resumeUrl;
+      } else {
+        resumeUrl = baseUrl + (app.resumeUrl.startsWith('/') ? '' : '/') + app.resumeUrl;
+      }
+    }
     return [
       app.id || '',
       app.fullName || '',
@@ -674,7 +683,7 @@ app.get('/api/admin/applications/export', authenticateAdmin, (req, res) => {
       Array.isArray(app.skills) ? app.skills.join('; ') : (app.skills || ''),
       app.status || 'New',
       app.recruiterNotes || '',
-      app.resumeFileName || '',
+      app.resumeFileName || (app.resumeUrl ? 'Resume.pdf' : 'No File Uploaded'),
       resumeUrl,
       app.createdAt ? new Date(app.createdAt).toLocaleString('en-IN') : ''
     ].map(val => `"${String(val).replace(/"/g, '""')}"`).join(',');

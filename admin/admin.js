@@ -92,6 +92,50 @@ function resolveResumeUrl(url) {
   return url;
 }
 
+window.downloadCandidateResume = function(appId) {
+  const app = (cachedApplications || []).find(a => a.id === appId);
+  if (!app || !app.resumeUrl) {
+    showToast('No resume file attached.', 'warning');
+    return;
+  }
+  const filename = app.resumeFileName || `${(app.fullName || 'Candidate').replace(/\s+/g, '_')}_Resume.pdf`;
+
+  if (app.resumeUrl.startsWith('data:')) {
+    try {
+      const parts = app.resumeUrl.split(',');
+      const mime = parts[0].match(/:(.*?);/)?.[1] || 'application/pdf';
+      const bstr = atob(parts[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      const blob = new Blob([u8arr], { type: mime });
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+      showToast(`Downloaded resume: ${filename}`, 'success');
+      return;
+    } catch (err) {
+      console.error('Error decoding base64 resume:', err);
+    }
+  }
+
+  // Real URL
+  const a = document.createElement('a');
+  a.href = resolveResumeUrl(app.resumeUrl);
+  a.target = '_blank';
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+};
+
 // Mobile Sidebar Toggle
 window.toggleAdminSidebar = function() {
   const sidebar = document.getElementById('adminSidebar');
@@ -433,9 +477,9 @@ async function loadAdminApplications() {
           <td><span style="font-size: 0.85rem;">${escapeHtml(app.noticePeriod)}</span></td>
           <td>
             ${app.resumeUrl ? `
-              <a href="${resolveResumeUrl(app.resumeUrl)}" target="_blank" download="${escapeAttr(app.resumeFileName || 'Resume')}" class="btn btn-outline btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+              <button type="button" onclick="downloadCandidateResume('${app.id}')" class="btn btn-outline btn-sm" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" title="Download CV (${escapeAttr(app.resumeFileName || 'Resume')})">
                 <i class="fas fa-download"></i> CV
-              </a>
+              </button>
             ` : (app.resumeFileName ? `
               <span class="badge" style="background: rgba(11,44,102,0.08); color: var(--primary); font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 4px;" title="${escapeAttr(app.resumeFileName)}">
                 <i class="fas fa-file-alt"></i> ${escapeHtml(app.resumeFileName.length > 12 ? app.resumeFileName.substring(0, 10) + '...' : app.resumeFileName)}
@@ -530,9 +574,9 @@ window.viewCandidateModal = function(appId) {
       <div style="margin-bottom: 1.5rem;">
         <strong>Uploaded Resume:</strong>
         <div style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-          <a href="${resolveResumeUrl(app.resumeUrl)}" target="_blank" download="${escapeAttr(app.resumeFileName || 'Resume')}" class="btn btn-primary btn-sm">
-            <i class="fas fa-file-pdf"></i> View / Download Resume (${escapeHtml(app.resumeFileName || 'Resume')})
-          </a>
+          <button type="button" onclick="downloadCandidateResume('${app.id}')" class="btn btn-primary btn-sm">
+            <i class="fas fa-file-pdf"></i> Download Resume (${escapeHtml(app.resumeFileName || 'Resume')})
+          </button>
         </div>
       </div>
     ` : (app.resumeFileName ? `
@@ -1008,12 +1052,15 @@ window.exportCandidatesToExcel = function () {
   showToast(`Preparing Excel export for ${cachedApplications.length} candidates...`, 'info');
 
   const rows = cachedApplications.map(app => {
-    let resumeFullUrl = '';
+    let resumeDisplay = 'No Resume Uploaded';
     if (app.resumeUrl) {
-      if (app.resumeUrl.startsWith('http') || app.resumeUrl.startsWith('data:')) {
-        resumeFullUrl = app.resumeUrl;
+      if (app.resumeUrl.startsWith('data:')) {
+        // Base64 file stored in browser / GitHub Pages storage
+        resumeDisplay = 'Attached in Admin Portal (Download CV / ZIP)';
+      } else if (app.resumeUrl.startsWith('http://') || app.resumeUrl.startsWith('https://')) {
+        resumeDisplay = app.resumeUrl;
       } else {
-        resumeFullUrl = window.location.origin + (app.resumeUrl.startsWith('/') ? '' : '/') + app.resumeUrl;
+        resumeDisplay = window.location.origin + (app.resumeUrl.startsWith('/') ? '' : '/') + app.resumeUrl;
       }
     }
 
@@ -1031,8 +1078,8 @@ window.exportCandidatesToExcel = function () {
       'Key Skills': Array.isArray(app.skills) ? app.skills.join(', ') : (app.skills || ''),
       'Status': app.status || 'New',
       'Recruiter Notes': app.recruiterNotes || '',
-      'Resume Filename': app.resumeFileName || (app.resumeUrl ? 'resume.pdf' : 'No Resume Uploaded'),
-      'Resume Download Link': resumeFullUrl || 'Not Uploaded',
+      'Resume Filename': app.resumeFileName || (app.resumeUrl ? 'Resume.pdf' : 'No Resume Uploaded'),
+      'Resume Download Link': resumeDisplay,
       'Applied Date': app.createdAt ? new Date(app.createdAt).toLocaleString('en-IN') : ''
     };
   });

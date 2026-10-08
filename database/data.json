@@ -63,48 +63,7 @@
       "createdAt": "2026-10-07T12:39:26.393Z"
     }
   ],
-  "applications": [
-    {
-      "id": "app_1791400358980",
-      "jobId": "job_1791381924591",
-      "jobTitle": "Data entry",
-      "fullName": "tofik",
-      "email": "tofikvora6@gmail.com",
-      "phone": "9601874036",
-      "currentLocation": "ahmedabad",
-      "experience": "Fresher / 0 Years",
-      "currentCTC": "150000",
-      "expectedCTC": "15000",
-      "noticePeriod": "Immediate Joiner",
-      "skills": "",
-      "coverNote": "",
-      "resumeFileName": "SettelmentLetter.pdf",
-      "resumeUrl": "/uploads/resumes/SettelmentLetter_pdf-1791400358965-469677.pdf",
-      "status": "Rejected",
-      "recruiterNotes": "Application received via portal",
-      "createdAt": "2026-10-07T19:12:38.980Z"
-    },
-    {
-      "id": "app_1791379474320",
-      "jobId": "job_1791376766393",
-      "jobTitle": "Senior Software Enginner",
-      "fullName": "Tofik Vhora",
-      "email": "tofikvora6@gmail.com",
-      "phone": "9601874036",
-      "currentLocation": "Ahmedabad",
-      "experience": "Fresher / 0 Years",
-      "currentCTC": "150000",
-      "expectedCTC": "1500000",
-      "noticePeriod": "Immediate Joiner",
-      "skills": "Developer",
-      "coverNote": "",
-      "resumeFileName": "Account_Balance_Enquiry_API_v1.0.pdf",
-      "resumeUrl": "/uploads/resumes/Account_Balance_Enqu-1791379474275-495992.pdf",
-      "status": "Rejected",
-      "recruiterNotes": "Application received via portal",
-      "createdAt": "2026-10-07T13:24:34.320Z"
-    }
-  ],
+  "applications": [],
   "employerRequests": [],
   "inquiries": [],
   "settings": {
