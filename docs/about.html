@@ -1,11 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About Us | CareerLine Solution</title>
   <meta name="description" content="Learn about CareerLine Solution, our history, mission, vision, and leadership team delivering recruitment and HR solutions across Pan-India.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230B2C66'/><path d='M30 70 L50 30 L70 70 Z' fill='%23C89B3C'/></svg>">
+  <link rel="icon" type="image/svg+xml" href="assets/company_logos/favicon.svg">
+  <meta property="og:image" content="assets/company_logos/careerline-og-banner.svg">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -33,20 +34,20 @@
       <a href="index.html" class="brand-logo">
         <div class="brand-icon-box"><i class="fas fa-briefcase"></i></div>
         <div class="brand-text-wrap">
-          <div class="brand-title" data-setting="siteName">CareerLine<span>Solution</span></div>
-          <div class="brand-subtitle" data-setting="tagline">HR & Staffing Consultants</div>
+          <div class="brand-title" data-setting="siteName">CareerLine<span>Solutions</span></div>
+          <div class="brand-subtitle" data-setting="tagline">TALENT. GROWTH. SUCCESS.</div>
         </div>
       </a>
       <button class="mobile-nav-toggle" aria-label="Toggle navigation"><i class="fas fa-bars"></i></button>
       <ul class="nav-menu" id="navMenu">
         <li class="nav-menu-header">
           <a href="index.html" class="brand-logo" style="text-decoration: none;">
-            <div class="brand-icon-box">
-              <i class="fas fa-briefcase"></i>
+            <div class="brand-icon-box" style="background: transparent; box-shadow: none; padding: 2px;">
+              <img src="assets/company_logos/careerline-logo-icon.svg" alt="CareerLineSolutions" style="width: 100%; height: 100%; object-fit: contain;">
             </div>
             <div class="brand-text-wrap">
-              <div class="brand-title" data-setting="siteName">CareerLine<span>Solution</span></div>
-              <div class="brand-subtitle" data-setting="tagline">HR &amp; Staffing Consultants</div>
+              <div class="brand-title" data-setting="siteName">CareerLine<span>Solutions</span></div>
+              <div class="brand-subtitle" data-setting="tagline">TALENT. GROWTH. SUCCESS.</div>
             </div>
           </a>
           <button class="mobile-nav-toggle mobile-close-btn" aria-label="Close navigation" onclick="document.querySelector('.nav-menu').classList.remove('open'); document.body.classList.remove('menu-open');">
@@ -87,12 +88,25 @@
   <section class="section section-bg-white">
     <div class="container about-grid">
       <div class="about-visual">
-        <div class="about-card-hero">
-          <i class="fas fa-handshake" style="font-size: 3rem; color: var(--accent); margin-bottom: 1.5rem;"></i>
-          <h3 style="font-size: 1.8rem; color: #FFFFFF; margin-bottom: 1rem;">Integrity, Speed & Reliability</h3>
-          <p style="color: #E2E8F0; font-size: 0.95rem; line-height: 1.7;">
-            We operate on a zero-compromise quality standard. From initial candidate sourcing to joining, we build meaningful partnerships that last.
-          </p>
+        <div class="about-card-hero" style="padding: 0; overflow: hidden; background: #071E47; border: 2px solid #E2E8F0;">
+          <div style="position: relative; height: 320px; overflow: hidden;">
+            <img src="images/showcase-01-boardroom-discussion.jpg" alt="CareerLineSolutions Executive Boardroom" style="width: 100%; height: 100%; object-fit: cover;">
+            <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(7,30,71,0.92) 0%, rgba(7,30,71,0.2) 60%, transparent 100%);"></div>
+            <div style="position: absolute; bottom: 16px; left: 20px; right: 20px;">
+              <span style="display: inline-block; padding: 4px 12px; background: #F97316; color: #FFF; border-radius: 999px; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 6px;">EXECUTIVE BOARDROOM</span>
+              <h4 style="color: #FFF; font-size: 1.25rem; font-weight: 800; margin: 0;">Pan-India Strategic Staffing</h4>
+            </div>
+          </div>
+          <div style="padding: 1.75rem 2rem;">
+            <p style="color: #E2E8F0; font-size: 0.925rem; line-height: 1.6; margin-bottom: 1.25rem;">
+              We operate on a zero-compromise quality standard. From initial candidate sourcing to joining, we build meaningful partnerships that last.
+            </p>
+            <div style="display: flex; gap: 10px;">
+              <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 700; color: #FDE047;">
+                <i class="fas fa-check-circle"></i> 100% Verified Placements
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
