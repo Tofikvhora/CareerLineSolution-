@@ -1,4 +1,4 @@
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const fs = require('fs');
 const path = require('path');
 
@@ -70,7 +70,38 @@ async function uploadResumeToR2(localFilePath, filename, mimeType) {
   return `https://${R2_BUCKET_NAME}.${R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${key}`;
 }
 
+/**
+ * Delete a resume from Cloudflare R2 bucket to free up storage space
+ * @param {string} resumeUrl - Public URL or key
+ */
+async function deleteResumeFromR2(resumeUrl) {
+  if (!isR2Configured || !s3Client || !resumeUrl) {
+    return;
+  }
+
+  try {
+    let key = '';
+    if (resumeUrl.startsWith('http://') || resumeUrl.startsWith('https://')) {
+      const urlObj = new URL(resumeUrl);
+      key = urlObj.pathname.replace(/^\//, '');
+    } else {
+      key = resumeUrl.replace(/^\//, '');
+    }
+
+    if (key) {
+      await s3Client.send(new DeleteObjectCommand({
+        Bucket: R2_BUCKET_NAME,
+        Key: key
+      }));
+      console.log(`[STORAGE] Deleted resume from Cloudflare R2: ${key}`);
+    }
+  } catch (err) {
+    console.warn('[STORAGE] Failed to delete file from Cloudflare R2:', err.message);
+  }
+}
+
 module.exports = {
   isR2Configured,
-  uploadResumeToR2
+  uploadResumeToR2,
+  deleteResumeFromR2
 };

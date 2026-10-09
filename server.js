@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { readData, writeData } = require('./database/db');
-const { isR2Configured, uploadResumeToR2 } = require('./services/r2Storage');
+const { isR2Configured, uploadResumeToR2, deleteResumeFromR2 } = require('./services/r2Storage');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -837,11 +837,25 @@ app.patch('/api/admin/applications/:id/status', authenticateAdmin, (req, res) =>
   res.json({ success: true, message: 'Candidate status updated.', application: appItem });
 });
 
-app.delete('/api/admin/applications/:id', authenticateAdmin, (req, res) => {
+app.delete('/api/admin/applications/:id', authenticateAdmin, async (req, res) => {
   const data = readData();
+  const targetApp = data.applications.find(a => a.id === req.params.id);
+
+  // Permanently delete attached resume from Cloudflare R2 or local disk to free space
+  if (targetApp && targetApp.resumeUrl) {
+    if (isR2Configured && (targetApp.resumeUrl.startsWith('http://') || targetApp.resumeUrl.startsWith('https://'))) {
+      await deleteResumeFromR2(targetApp.resumeUrl);
+    } else if (targetApp.resumeUrl.startsWith('/uploads/')) {
+      const localDiskPath = path.join(__dirname, targetApp.resumeUrl);
+      if (fs.existsSync(localDiskPath)) {
+        try { fs.unlinkSync(localDiskPath); } catch (e) {}
+      }
+    }
+  }
+
   data.applications = data.applications.filter(a => a.id !== req.params.id);
   writeData(data);
-  res.json({ success: true, message: 'Application deleted.' });
+  res.json({ success: true, message: 'Application and attached resume file deleted successfully.' });
 });
 
 // Export Applications to CSV/Excel
