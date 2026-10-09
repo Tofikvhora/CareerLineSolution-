@@ -157,7 +157,7 @@
     ],
     settings: {
       siteName: 'CareerLine Solutions',
-      tagline: 'Tofik vora',
+      tagline: 'TALENT. GROWTH. SUCCESS.',
       phone: '+91 9601874036',
       altPhone: '+91 9601874036',
       whatsapp: '9601874036',
