@@ -72,7 +72,10 @@
 - [x] Create `Rules.Md` (Engineering Standards & Security Invariants).
 - [x] Create `tasks.md` (Milestone & Task Tracker).
 
-### Phase 7: Production Cloudflare Deployment (Future Roadmap)
-- [ ] Connect candidate resume uploads to Cloudflare R2 bucket (10 GB free forever).
-- [ ] Deploy static site to Cloudflare Pages with custom domain binding.
-- [ ] Migrate `data.json` to Cloudflare D1 or Supabase if moving to serverless architecture.
+### Phase 7: Cloudflare R2 Cloud Storage Integration
+- [x] Integrate `@aws-sdk/client-s3` for S3-compatible Cloudflare R2 uploads.
+- [x] Create `services/r2Storage.js` with `uploadResumeToR2()` and `deleteResumeFromR2()`.
+- [x] Connect `/api/apply` route with automatic R2 upload and local disk fallback.
+- [x] Connect `DELETE /api/admin/applications/:id` route to delete files from R2 to free space.
+- [x] Create `R2_STORAGE_GUIDE.md` containing capacity, pricing matrix, and setup guide.
+- [ ] Add R2 environment variables in Render Dashboard when client approves production.
