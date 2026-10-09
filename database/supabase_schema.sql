@@ -100,13 +100,37 @@ CREATE TABLE IF NOT EXISTS cls_settings (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Disable Row Level Security (RLS) so the server API can access all tables
+-- Disable Row Level Security (RLS) and grant permissions to server roles
 ALTER TABLE cls_users DISABLE ROW LEVEL SECURITY;
 ALTER TABLE cls_jobs DISABLE ROW LEVEL SECURITY;
 ALTER TABLE cls_applications DISABLE ROW LEVEL SECURITY;
 ALTER TABLE cls_employer_requests DISABLE ROW LEVEL SECURITY;
 ALTER TABLE cls_inquiries DISABLE ROW LEVEL SECURITY;
 ALTER TABLE cls_settings DISABLE ROW LEVEL SECURITY;
+
+-- Add permissive policies in case RLS is forced by Supabase project defaults
+DROP POLICY IF EXISTS "public_users" ON cls_users;
+CREATE POLICY "public_users" ON cls_users FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "public_jobs" ON cls_jobs;
+CREATE POLICY "public_jobs" ON cls_jobs FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "public_applications" ON cls_applications;
+CREATE POLICY "public_applications" ON cls_applications FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "public_employer_requests" ON cls_employer_requests;
+CREATE POLICY "public_employer_requests" ON cls_employer_requests FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "public_inquiries" ON cls_inquiries;
+CREATE POLICY "public_inquiries" ON cls_inquiries FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "public_settings" ON cls_settings;
+CREATE POLICY "public_settings" ON cls_settings FOR ALL USING (true) WITH CHECK (true);
+
+-- Grant full table access to all API roles
+GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL ROUTINES IN SCHEMA public TO anon, authenticated, service_role;
 
 -- Create indexes for lightning-fast queries and candidate search
 CREATE INDEX IF NOT EXISTS idx_cls_jobs_status ON cls_jobs(status);

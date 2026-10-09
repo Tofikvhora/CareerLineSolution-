@@ -228,38 +228,43 @@ function inqToRow(i) {
 async function autoSeedSupabaseIfEmpty() {
   if (!supabase) return;
   try {
-    const { count, error } = await supabase.from('cls_users').select('*', { count: 'exact', head: true });
-    if (error) {
-      console.warn('[DATABASE] Supabase check warning (Ensure supabase_schema.sql was run in Supabase SQL editor):', error.message);
-      return;
+    const local = readData();
+
+    // 1. Check and Seed Users
+    const { count: userCount, error: userErr } = await supabase.from('cls_users').select('*', { count: 'exact', head: true });
+    if (userErr) {
+      console.warn('[DATABASE] cls_users access warning:', userErr.message);
+    } else if (userCount === 0 && local.users && local.users.length > 0) {
+      console.log('[DATABASE] Seeding initial users into Supabase...');
+      const { error: insertUserErr } = await supabase.from('cls_users').insert(local.users.map(userToRow));
+      if (insertUserErr) console.error('[DATABASE] Failed to seed users:', insertUserErr.message);
+      else console.log('[DATABASE] Users seeded successfully.');
     }
 
-    if (count === 0) {
-      console.log('[DATABASE] Supabase tables are empty! Automatically seeding initial data from local JSON...');
-      const local = readData();
+    // 2. Check and Seed Jobs
+    const { count: jobCount, error: jobErr } = await supabase.from('cls_jobs').select('*', { count: 'exact', head: true });
+    if (jobErr) {
+      console.warn('[DATABASE] cls_jobs access warning:', jobErr.message);
+    } else if (jobCount === 0 && local.jobs && local.jobs.length > 0) {
+      console.log('[DATABASE] Seeding initial jobs into Supabase...');
+      const { error: insertJobErr } = await supabase.from('cls_jobs').insert(local.jobs.map(jobToRow));
+      if (insertJobErr) console.error('[DATABASE] Failed to seed jobs:', insertJobErr.message);
+      else console.log(`[DATABASE] Seeded ${local.jobs.length} jobs into Supabase successfully.`);
+    }
 
-      // Seed Users
-      if (local.users && local.users.length > 0) {
-        await supabase.from('cls_users').insert(local.users.map(userToRow));
-      }
-
-      // Seed Jobs
-      if (local.jobs && local.jobs.length > 0) {
-        await supabase.from('cls_jobs').insert(local.jobs.map(jobToRow));
-      }
-
-      // Seed Settings
-      if (local.settings) {
-        await supabase.from('cls_settings').upsert({
-          id: 'site_settings',
-          data: local.settings,
-          updated_at: new Date().toISOString()
-        });
-      }
-
-      console.log('[DATABASE] Supabase initial data migration completed successfully!');
-    } else {
-      console.log(`[DATABASE] Connected to Supabase PostgreSQL (${count} users registered).`);
+    // 3. Check and Seed Settings
+    const { data: settingsRow, error: settingsErr } = await supabase.from('cls_settings').select('id').eq('id', 'site_settings').maybeSingle();
+    if (settingsErr) {
+      console.warn('[DATABASE] cls_settings access warning:', settingsErr.message);
+    } else if (!settingsRow && local.settings) {
+      console.log('[DATABASE] Seeding initial settings into Supabase...');
+      const { error: insertSetErr } = await supabase.from('cls_settings').upsert({
+        id: 'site_settings',
+        data: local.settings,
+        updated_at: new Date().toISOString()
+      });
+      if (insertSetErr) console.error('[DATABASE] Failed to seed settings:', insertSetErr.message);
+      else console.log('[DATABASE] Settings seeded successfully.');
     }
   } catch (seedErr) {
     console.error('[DATABASE] Error during automatic Supabase seed:', seedErr.message);
