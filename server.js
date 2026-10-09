@@ -7,7 +7,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const { readData, writeData } = require('./database/db');
+const db = require('./services/supabaseDb');
 const { isR2Configured, uploadResumeToR2, deleteResumeFromR2 } = require('./services/r2Storage');
 
 const app = express();
@@ -238,138 +238,152 @@ app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'adm
 // -------------------------------------------------------------
 
 // 1. Get Site Settings & Info
-app.get('/api/settings', (req, res) => {
-  const data = readData();
-  res.json({ success: true, settings: data.settings });
+app.get('/api/settings', async (req, res) => {
+  try {
+    const settings = await db.getSettings();
+    res.json({ success: true, settings });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Failed to load settings' });
+  }
 });
 
 // 2. Search & Filter Jobs (Pan-India)
-app.get('/api/jobs', (req, res) => {
-  const data = readData();
-  let list = data.jobs || [];
+app.get('/api/jobs', async (req, res) => {
+  try {
+    let list = await db.getJobs();
 
-  // Query parameters
-  const {
-    q,
-    category,
-    location,
-    jobType,
-    workMode,
-    experienceRange,
-    urgent,
-    featured,
-    page = 1,
-    limit = 12
-  } = req.query;
+    // Query parameters
+    const {
+      q,
+      category,
+      location,
+      jobType,
+      workMode,
+      experienceRange,
+      urgent,
+      featured,
+      page = 1,
+      limit = 12
+    } = req.query;
 
-  // By default, public only sees Active jobs
-  list = list.filter(j => j.status === 'Active');
+    // By default, public only sees Active jobs
+    list = list.filter(j => j.status === 'Active');
 
-  // Search keyword (matches title, skills, description, company, city)
-  if (q && q.trim()) {
-    const term = q.trim().toLowerCase();
-    list = list.filter(j => 
-      j.title.toLowerCase().includes(term) ||
-      (j.skills && j.skills.some(s => s.toLowerCase().includes(term))) ||
-      (j.category && j.category.toLowerCase().includes(term)) ||
-      (j.location && j.location.toLowerCase().includes(term)) ||
-      (j.city && j.city.toLowerCase().includes(term)) ||
-      (j.description && j.description.toLowerCase().includes(term))
-    );
+    // Search keyword (matches title, skills, description, company, city)
+    if (q && q.trim()) {
+      const term = q.trim().toLowerCase();
+      list = list.filter(j => 
+        j.title.toLowerCase().includes(term) ||
+        (j.skills && j.skills.some(s => s.toLowerCase().includes(term))) ||
+        (j.category && j.category.toLowerCase().includes(term)) ||
+        (j.location && j.location.toLowerCase().includes(term)) ||
+        (j.city && j.city.toLowerCase().includes(term)) ||
+        (j.description && j.description.toLowerCase().includes(term))
+      );
+    }
+
+    // Category filter
+    if (category && category !== 'All') {
+      list = list.filter(j => j.category && j.category.toLowerCase() === category.toLowerCase());
+    }
+
+    // Location filter (city / state)
+    if (location && location !== 'All') {
+      const loc = location.toLowerCase();
+      list = list.filter(j => 
+        (j.location && j.location.toLowerCase().includes(loc)) ||
+        (j.city && j.city.toLowerCase().includes(loc)) ||
+        (j.state && j.state.toLowerCase().includes(loc))
+      );
+    }
+
+    // Job Type filter
+    if (jobType && jobType !== 'All') {
+      list = list.filter(j => j.jobType && j.jobType.toLowerCase() === jobType.toLowerCase());
+    }
+
+    // Work Mode filter (On-Site, Hybrid, Remote)
+    if (workMode && workMode !== 'All') {
+      list = list.filter(j => j.workMode && j.workMode.toLowerCase() === workMode.toLowerCase());
+    }
+
+    // Experience filter
+    if (experienceRange && experienceRange !== 'All') {
+      list = list.filter(j => j.experienceRange === experienceRange);
+    }
+
+    // Urgent filter
+    if (urgent === 'true') {
+      list = list.filter(j => j.urgent === true);
+    }
+
+    // Featured filter
+    if (featured === 'true') {
+      list = list.filter(j => j.featured === true);
+    }
+
+    // Sort: newest first
+    list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    // Pagination
+    const total = list.length;
+    const pageNum = parseInt(page, 10) || 1;
+    const limitNum = parseInt(limit, 10) || 12;
+    const startIndex = (pageNum - 1) * limitNum;
+    const paginated = list.slice(startIndex, startIndex + limitNum);
+
+    res.json({
+      success: true,
+      total,
+      page: pageNum,
+      totalPages: Math.ceil(total / limitNum) || 1,
+      jobs: paginated
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Failed to search jobs' });
   }
-
-  // Category filter
-  if (category && category !== 'All') {
-    list = list.filter(j => j.category && j.category.toLowerCase() === category.toLowerCase());
-  }
-
-  // Location filter (city / state)
-  if (location && location !== 'All') {
-    const loc = location.toLowerCase();
-    list = list.filter(j => 
-      (j.location && j.location.toLowerCase().includes(loc)) ||
-      (j.city && j.city.toLowerCase().includes(loc)) ||
-      (j.state && j.state.toLowerCase().includes(loc))
-    );
-  }
-
-  // Job Type filter
-  if (jobType && jobType !== 'All') {
-    list = list.filter(j => j.jobType && j.jobType.toLowerCase() === jobType.toLowerCase());
-  }
-
-  // Work Mode filter (On-Site, Hybrid, Remote)
-  if (workMode && workMode !== 'All') {
-    list = list.filter(j => j.workMode && j.workMode.toLowerCase() === workMode.toLowerCase());
-  }
-
-  // Experience filter
-  if (experienceRange && experienceRange !== 'All') {
-    list = list.filter(j => j.experienceRange === experienceRange);
-  }
-
-  // Urgent filter
-  if (urgent === 'true') {
-    list = list.filter(j => j.urgent === true);
-  }
-
-  // Featured filter
-  if (featured === 'true') {
-    list = list.filter(j => j.featured === true);
-  }
-
-  // Sort: newest first
-  list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-  // Pagination
-  const total = list.length;
-  const pageNum = parseInt(page, 10) || 1;
-  const limitNum = parseInt(limit, 10) || 12;
-  const startIndex = (pageNum - 1) * limitNum;
-  const paginated = list.slice(startIndex, startIndex + limitNum);
-
-  res.json({
-    success: true,
-    total,
-    page: pageNum,
-    totalPages: Math.ceil(total / limitNum) || 1,
-    jobs: paginated
-  });
 });
 
 // 3. Get Single Job Details
-app.get('/api/jobs/:id', (req, res) => {
-  const data = readData();
-  const job = data.jobs.find(j => j.id === req.params.id);
-  if (!job) {
-    return res.status(404).json({ success: false, message: 'Job opening not found' });
+app.get('/api/jobs/:id', async (req, res) => {
+  try {
+    const job = await db.getJobById(req.params.id);
+    if (!job) {
+      return res.status(404).json({ success: false, message: 'Job opening not found' });
+    }
+    res.json({ success: true, job });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Failed to load job details' });
   }
-  res.json({ success: true, job });
 });
 
 // 4. Get Categories and Locations with Job Counts
-app.get('/api/job-meta', (req, res) => {
-  const data = readData();
-  const activeJobs = data.jobs.filter(j => j.status === 'Active');
+app.get('/api/job-meta', async (req, res) => {
+  try {
+    const allJobs = await db.getJobs();
+    const activeJobs = allJobs.filter(j => j.status === 'Active');
 
-  const categories = {};
-  const locations = {};
+    const categories = {};
+    const locations = {};
 
-  activeJobs.forEach(j => {
-    if (j.category) {
-      categories[j.category] = (categories[j.category] || 0) + 1;
-    }
-    if (j.city) {
-      locations[j.city] = (locations[j.city] || 0) + 1;
-    }
-  });
+    activeJobs.forEach(j => {
+      if (j.category) {
+        categories[j.category] = (categories[j.category] || 0) + 1;
+      }
+      if (j.city) {
+        locations[j.city] = (locations[j.city] || 0) + 1;
+      }
+    });
 
-  res.json({
-    success: true,
-    categories: Object.keys(categories).map(name => ({ name, count: categories[name] })),
-    locations: Object.keys(locations).map(name => ({ name, count: locations[name] })),
-    totalActiveJobs: activeJobs.length
-  });
+    res.json({
+      success: true,
+      categories: Object.keys(categories).map(name => ({ name, count: categories[name] })),
+      locations: Object.keys(locations).map(name => ({ name, count: locations[name] })),
+      totalActiveJobs: activeJobs.length
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Failed to load job metadata' });
+  }
 });
 
 // 5. Submit Candidate Job Application (Protected with rate limiting, anti-bot, magic byte checks)
@@ -428,8 +442,7 @@ app.post('/api/apply', applyLimiter, (req, res) => {
         return res.status(400).json({ success: false, message: 'Please provide full name, email and phone number.' });
       }
 
-      const data = readData();
-      const job = (data.jobs || []).find(j => j.id === jobId) || { title: 'General Application' };
+      const job = (await db.getJobById(jobId)) || { title: 'General Application' };
 
       // 3. Cloud Storage Upload (Cloudflare R2 with local disk fallback)
       let resumeUrl = req.file ? `/uploads/resumes/${req.file.filename}` : '';
@@ -466,9 +479,7 @@ app.post('/api/apply', applyLimiter, (req, res) => {
         createdAt: new Date().toISOString()
       };
 
-      if (!data.applications) data.applications = [];
-      data.applications.unshift(newApplication);
-      writeData(data);
+      await db.createApplication(newApplication);
 
       res.json({
         success: true,
@@ -484,7 +495,7 @@ app.post('/api/apply', applyLimiter, (req, res) => {
 });
 
 // 6. Submit Employer Staffing Requirement (Protected with inquiryLimiter & verifyAntiBot)
-app.post('/api/employer-request', inquiryLimiter, verifyAntiBot, (req, res) => {
+app.post('/api/employer-request', inquiryLimiter, verifyAntiBot, async (req, res) => {
   try {
     const companyName = sanitizeInput(req.body.companyName);
     const contactPerson = sanitizeInput(req.body.contactPerson);
@@ -502,7 +513,6 @@ app.post('/api/employer-request', inquiryLimiter, verifyAntiBot, (req, res) => {
       return res.status(400).json({ success: false, message: 'Company name, contact person, email, and phone are required.' });
     }
 
-    const data = readData();
     const newRequest = {
       id: 'req_' + Date.now(),
       companyName,
@@ -521,8 +531,7 @@ app.post('/api/employer-request', inquiryLimiter, verifyAntiBot, (req, res) => {
       createdAt: new Date().toISOString()
     };
 
-    data.employerRequests.unshift(newRequest);
-    writeData(data);
+    await db.createEmployerRequest(newRequest);
 
     res.json({
       success: true,
@@ -535,7 +544,7 @@ app.post('/api/employer-request', inquiryLimiter, verifyAntiBot, (req, res) => {
 });
 
 // 7. General Contact Form (Protected with inquiryLimiter & verifyAntiBot)
-app.post('/api/contact', inquiryLimiter, verifyAntiBot, (req, res) => {
+app.post('/api/contact', inquiryLimiter, verifyAntiBot, async (req, res) => {
   try {
     const name = sanitizeInput(req.body.name);
     const email = sanitizeInput(req.body.email);
@@ -547,7 +556,6 @@ app.post('/api/contact', inquiryLimiter, verifyAntiBot, (req, res) => {
       return res.status(400).json({ success: false, message: 'Name, email and message are required.' });
     }
 
-    const data = readData();
     const newInquiry = {
       id: 'inq_' + Date.now(),
       name,
@@ -559,8 +567,7 @@ app.post('/api/contact', inquiryLimiter, verifyAntiBot, (req, res) => {
       createdAt: new Date().toISOString()
     };
 
-    data.inquiries.unshift(newInquiry);
-    writeData(data);
+    await db.createInquiry(newInquiry);
 
     res.json({
       success: true,
@@ -577,14 +584,13 @@ app.post('/api/contact', inquiryLimiter, verifyAntiBot, (req, res) => {
 // -------------------------------------------------------------
 
 // Admin Login (Protected with loginLimiter against brute-force attacks)
-app.post('/api/admin/login', loginLimiter, (req, res) => {
+app.post('/api/admin/login', loginLimiter, async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res.status(400).json({ success: false, message: 'Email and password are required.' });
   }
 
-  const data = readData();
-  const user = data.users.find(u => u.email.toLowerCase() === email.trim().toLowerCase());
+  const user = await db.findUserByEmail(email);
 
   if (!user) {
     return res.status(401).json({ success: false, message: 'Invalid credentials or user not found.' });
@@ -640,56 +646,50 @@ app.get('/api/admin/me', authenticateAdmin, (req, res) => {
 // -------------------------------------------------------------
 
 // Dashboard KPI Stats
-app.get('/api/admin/dashboard-stats', authenticateAdmin, (req, res) => {
-  const data = readData();
-  const jobs = data.jobs || [];
-  const apps = data.applications || [];
-  const reqs = data.employerRequests || [];
-  const inqs = data.inquiries || [];
-
-  res.json({
-    success: true,
-    stats: {
-      totalJobs: jobs.length,
-      activeJobs: jobs.filter(j => j.status === 'Active').length,
-      totalApplications: apps.length,
-      newApplications: apps.filter(a => a.status === 'New').length,
-      shortlistedCandidates: apps.filter(a => a.status === 'Shortlisted').length,
-      employerRequests: reqs.length,
-      newEmployerRequests: reqs.filter(r => r.status === 'New').length,
-      inquiries: inqs.length,
-      users: (data.users || []).length
-    },
-    recentApplications: apps.slice(0, 5),
-    recentEmployerRequests: reqs.slice(0, 5)
-  });
+app.get('/api/admin/dashboard-stats', authenticateAdmin, async (req, res) => {
+  try {
+    const statsData = await db.getDashboardStats();
+    res.json({
+      success: true,
+      stats: statsData.stats,
+      recentApplications: statsData.recentApplications,
+      recentEmployerRequests: statsData.recentEmployerRequests
+    });
+  } catch (err) {
+    console.error('Dashboard stats error:', err);
+    res.status(500).json({ success: false, message: 'Server error loading stats.' });
+  }
 });
 
 // Jobs Management
-app.get('/api/admin/jobs', authenticateAdmin, (req, res) => {
-  const data = readData();
-  const { status, category, search } = req.query;
-  let jobs = [...data.jobs];
+app.get('/api/admin/jobs', authenticateAdmin, async (req, res) => {
+  try {
+    const allJobs = await db.getJobs();
+    const { status, category, search } = req.query;
+    let jobs = [...allJobs];
 
-  if (status && status !== 'All') {
-    jobs = jobs.filter(j => j.status === status);
-  }
-  if (category && category !== 'All') {
-    jobs = jobs.filter(j => j.category === category);
-  }
-  if (search && search.trim()) {
-    const q = search.trim().toLowerCase();
-    jobs = jobs.filter(j => 
-      j.title.toLowerCase().includes(q) ||
-      (j.location && j.location.toLowerCase().includes(q))
-    );
-  }
+    if (status && status !== 'All') {
+      jobs = jobs.filter(j => j.status === status);
+    }
+    if (category && category !== 'All') {
+      jobs = jobs.filter(j => j.category === category);
+    }
+    if (search && search.trim()) {
+      const q = search.trim().toLowerCase();
+      jobs = jobs.filter(j => 
+        j.title.toLowerCase().includes(q) ||
+        (j.location && j.location.toLowerCase().includes(q))
+      );
+    }
 
-  jobs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  res.json({ success: true, jobs });
+    jobs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    res.json({ success: true, jobs });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error loading jobs.' });
+  }
 });
 
-app.post('/api/admin/jobs', authenticateAdmin, (req, res) => {
+app.post('/api/admin/jobs', authenticateAdmin, async (req, res) => {
   const {
     title,
     category,
@@ -716,7 +716,6 @@ app.post('/api/admin/jobs', authenticateAdmin, (req, res) => {
     return res.status(400).json({ success: false, message: 'Job title, category, and location are required.' });
   }
 
-  const data = readData();
   const newJob = {
     id: 'job_' + Date.now(),
     title,
@@ -741,105 +740,75 @@ app.post('/api/admin/jobs', authenticateAdmin, (req, res) => {
     createdAt: new Date().toISOString()
   };
 
-  data.jobs.unshift(newJob);
-  writeData(data);
-
-  res.json({ success: true, message: 'Job opening posted successfully!', job: newJob });
+  const created = await db.createJob(newJob);
+  res.json({ success: true, message: 'Job opening posted successfully!', job: created });
 });
 
-app.put('/api/admin/jobs/:id', authenticateAdmin, (req, res) => {
-  const data = readData();
-  const index = data.jobs.findIndex(j => j.id === req.params.id);
-  if (index === -1) {
+app.put('/api/admin/jobs/:id', authenticateAdmin, async (req, res) => {
+  const updated = await db.updateJob(req.params.id, req.body);
+  if (!updated) {
     return res.status(404).json({ success: false, message: 'Job not found.' });
   }
-
-  const existing = data.jobs[index];
-  const updated = {
-    ...existing,
-    ...req.body,
-    id: existing.id,
-    createdAt: existing.createdAt,
-    skills: Array.isArray(req.body.skills) ? req.body.skills : (req.body.skills ? req.body.skills.split(',').map(s => s.trim()).filter(Boolean) : existing.skills)
-  };
-
-  data.jobs[index] = updated;
-  writeData(data);
-
   res.json({ success: true, message: 'Job opening updated successfully!', job: updated });
 });
 
-app.patch('/api/admin/jobs/:id/toggle-status', authenticateAdmin, (req, res) => {
-  const data = readData();
-  const job = data.jobs.find(j => j.id === req.params.id);
-  if (!job) {
+app.patch('/api/admin/jobs/:id/toggle-status', authenticateAdmin, async (req, res) => {
+  const updated = await db.toggleJobStatus(req.params.id);
+  if (!updated) {
     return res.status(404).json({ success: false, message: 'Job not found.' });
   }
-
-  job.status = job.status === 'Active' ? 'Inactive' : 'Active';
-  writeData(data);
-
-  res.json({ success: true, message: `Job is now ${job.status}`, status: job.status });
+  res.json({ success: true, message: `Job is now ${updated.status}`, status: updated.status });
 });
 
-app.delete('/api/admin/jobs/:id', authenticateAdmin, (req, res) => {
-  const data = readData();
-  const initialLen = data.jobs.length;
-  data.jobs = data.jobs.filter(j => j.id !== req.params.id);
-
-  if (data.jobs.length === initialLen) {
+app.delete('/api/admin/jobs/:id', authenticateAdmin, async (req, res) => {
+  const deleted = await db.deleteJob(req.params.id);
+  if (!deleted) {
     return res.status(404).json({ success: false, message: 'Job not found.' });
   }
-
-  writeData(data);
   res.json({ success: true, message: 'Job opening deleted successfully.' });
 });
 
 // Applications Management
-app.get('/api/admin/applications', authenticateAdmin, (req, res) => {
-  const data = readData();
-  const { jobId, status, search } = req.query;
-  let apps = [...data.applications];
+app.get('/api/admin/applications', authenticateAdmin, async (req, res) => {
+  try {
+    const allApps = await db.getApplications();
+    const { jobId, status, search } = req.query;
+    let apps = [...allApps];
 
-  if (jobId && jobId !== 'All') {
-    apps = apps.filter(a => a.jobId === jobId);
-  }
-  if (status && status !== 'All') {
-    apps = apps.filter(a => a.status === status);
-  }
-  if (search && search.trim()) {
-    const q = search.trim().toLowerCase();
-    apps = apps.filter(a => 
-      a.fullName.toLowerCase().includes(q) ||
-      a.email.toLowerCase().includes(q) ||
-      a.phone.toLowerCase().includes(q) ||
-      a.jobTitle.toLowerCase().includes(q)
-    );
-  }
+    if (jobId && jobId !== 'All') {
+      apps = apps.filter(a => a.jobId === jobId);
+    }
+    if (status && status !== 'All') {
+      apps = apps.filter(a => a.status === status);
+    }
+    if (search && search.trim()) {
+      const q = search.trim().toLowerCase();
+      apps = apps.filter(a => 
+        a.fullName.toLowerCase().includes(q) ||
+        a.email.toLowerCase().includes(q) ||
+        a.phone.toLowerCase().includes(q) ||
+        a.jobTitle.toLowerCase().includes(q)
+      );
+    }
 
-  apps.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  res.json({ success: true, applications: apps });
+    apps.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    res.json({ success: true, applications: apps });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error loading applications.' });
+  }
 });
 
-app.patch('/api/admin/applications/:id/status', authenticateAdmin, (req, res) => {
+app.patch('/api/admin/applications/:id/status', authenticateAdmin, async (req, res) => {
   const { status, recruiterNotes } = req.body;
-  const data = readData();
-  const appItem = data.applications.find(a => a.id === req.params.id);
-
-  if (!appItem) {
+  const updated = await db.updateApplication(req.params.id, { status, recruiterNotes });
+  if (!updated) {
     return res.status(404).json({ success: false, message: 'Application not found.' });
   }
-
-  if (status) appItem.status = status;
-  if (recruiterNotes !== undefined) appItem.recruiterNotes = recruiterNotes;
-
-  writeData(data);
-  res.json({ success: true, message: 'Candidate status updated.', application: appItem });
+  res.json({ success: true, message: 'Candidate status updated.', application: updated });
 });
 
 app.delete('/api/admin/applications/:id', authenticateAdmin, async (req, res) => {
-  const data = readData();
-  const targetApp = data.applications.find(a => a.id === req.params.id);
+  const targetApp = await db.getApplicationById(req.params.id);
 
   // Permanently delete attached resume from Cloudflare R2 or local disk to free space
   if (targetApp && targetApp.resumeUrl) {
@@ -853,157 +822,160 @@ app.delete('/api/admin/applications/:id', authenticateAdmin, async (req, res) =>
     }
   }
 
-  data.applications = data.applications.filter(a => a.id !== req.params.id);
-  writeData(data);
+  await db.deleteApplication(req.params.id);
   res.json({ success: true, message: 'Application and attached resume file deleted successfully.' });
 });
 
 // Export Applications to CSV/Excel
-app.get('/api/admin/applications/export', authenticateAdmin, (req, res) => {
-  const data = readData();
-  const apps = data.applications || [];
+app.get('/api/admin/applications/export', authenticateAdmin, async (req, res) => {
+  try {
+    const apps = (await db.getApplications()) || [];
 
-  const headers = [
-    'Application ID',
-    'Candidate Name',
-    'Email',
-    'Phone',
-    'Position Applied',
-    'Experience',
-    'Current Location',
-    'Current CTC',
-    'Expected CTC',
-    'Notice Period',
-    'Skills',
-    'Status',
-    'Recruiter Notes',
-    'Resume Filename',
-    'Resume Download Link',
-    'Applied Date'
-  ];
+    const headers = [
+      'Application ID',
+      'Candidate Name',
+      'Email',
+      'Phone',
+      'Position Applied',
+      'Experience',
+      'Current Location',
+      'Current CTC',
+      'Expected CTC',
+      'Notice Period',
+      'Skills',
+      'Status',
+      'Recruiter Notes',
+      'Resume Filename',
+      'Resume Download Link',
+      'Applied Date'
+    ];
 
-  const baseUrl = req.protocol + '://' + req.get('host');
+    const baseUrl = req.protocol + '://' + req.get('host');
 
-  const rows = apps.map(app => {
-    let resumeUrl = 'No File Uploaded';
-    if (app.resumeUrl) {
-      if (app.resumeUrl.startsWith('data:')) {
-        resumeUrl = 'Attached in Admin Portal (Download CV / ZIP)';
-      } else if (app.resumeUrl.startsWith('http')) {
-        resumeUrl = app.resumeUrl;
-      } else {
-        resumeUrl = baseUrl + (app.resumeUrl.startsWith('/') ? '' : '/') + app.resumeUrl;
+    const rows = apps.map(app => {
+      let resumeUrl = 'No File Uploaded';
+      if (app.resumeUrl) {
+        if (app.resumeUrl.startsWith('data:')) {
+          resumeUrl = 'Attached in Admin Portal (Download CV / ZIP)';
+        } else if (app.resumeUrl.startsWith('http')) {
+          resumeUrl = app.resumeUrl;
+        } else {
+          resumeUrl = baseUrl + (app.resumeUrl.startsWith('/') ? '' : '/') + app.resumeUrl;
+        }
       }
-    }
-    return [
-      app.id || '',
-      app.fullName || '',
-      app.email || '',
-      app.phone || '',
-      app.jobTitle || 'General Application',
-      app.experience || '',
-      app.currentLocation || '',
-      app.currentCTC || '',
-      app.expectedCTC || '',
-      app.noticePeriod || '',
-      Array.isArray(app.skills) ? app.skills.join('; ') : (app.skills || ''),
-      app.status || 'New',
-      app.recruiterNotes || '',
-      app.resumeFileName || (app.resumeUrl ? 'Resume.pdf' : 'No File Uploaded'),
-      resumeUrl,
-      app.createdAt ? new Date(app.createdAt).toLocaleString('en-IN') : ''
-    ].map(val => `"${String(val).replace(/"/g, '""')}"`).join(',');
-  });
+      return [
+        app.id || '',
+        app.fullName || '',
+        app.email || '',
+        app.phone || '',
+        app.jobTitle || 'General Application',
+        app.experience || '',
+        app.currentLocation || '',
+        app.currentCTC || '',
+        app.expectedCTC || '',
+        app.noticePeriod || '',
+        Array.isArray(app.skills) ? app.skills.join('; ') : (app.skills || ''),
+        app.status || 'New',
+        app.recruiterNotes || '',
+        app.resumeFileName || (app.resumeUrl ? 'Resume.pdf' : 'No File Uploaded'),
+        resumeUrl,
+        app.createdAt ? new Date(app.createdAt).toLocaleString('en-IN') : ''
+      ].map(val => `"${String(val).replace(/"/g, '""')}"`).join(',');
+    });
 
-  const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\r\n');
-  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition', `attachment; filename="CareerLine_Candidate_Applications_${new Date().toISOString().split('T')[0]}.csv"`);
-  res.send(csvContent);
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\r\n');
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="CareerLine_Candidate_Applications_${new Date().toISOString().split('T')[0]}.csv"`);
+    res.send(csvContent);
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Failed to export applications.' });
+  }
 });
 
 // Employer Staffing Requests
-app.get('/api/admin/employer-requests', authenticateAdmin, (req, res) => {
-  const data = readData();
-  const reqs = [...data.employerRequests];
-  reqs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  res.json({ success: true, requests: reqs });
+app.get('/api/admin/employer-requests', authenticateAdmin, async (req, res) => {
+  try {
+    const allReqs = await db.getEmployerRequests();
+    let reqs = [...allReqs];
+    reqs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    res.json({ success: true, requests: reqs });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error loading requests.' });
+  }
 });
 
-app.patch('/api/admin/employer-requests/:id/status', authenticateAdmin, (req, res) => {
+app.patch('/api/admin/employer-requests/:id/status', authenticateAdmin, async (req, res) => {
   const { status, notes } = req.body;
-  const data = readData();
-  const reqItem = data.employerRequests.find(r => r.id === req.params.id);
-
-  if (!reqItem) {
+  const updated = await db.updateEmployerRequest(req.params.id, { status, notes });
+  if (!updated) {
     return res.status(404).json({ success: false, message: 'Request not found.' });
   }
-
-  if (status) reqItem.status = status;
-  if (notes !== undefined) reqItem.notes = notes;
-
-  writeData(data);
-  res.json({ success: true, message: 'Employer request updated.', request: reqItem });
+  res.json({ success: true, message: 'Employer request updated.', request: updated });
 });
 
-app.delete('/api/admin/employer-requests/:id', authenticateAdmin, (req, res) => {
-  const data = readData();
-  data.employerRequests = data.employerRequests.filter(r => r.id !== req.params.id);
-  writeData(data);
+app.delete('/api/admin/employer-requests/:id', authenticateAdmin, async (req, res) => {
+  const deleted = await db.deleteEmployerRequest(req.params.id);
+  if (!deleted) {
+    return res.status(404).json({ success: false, message: 'Request not found.' });
+  }
   res.json({ success: true, message: 'Request deleted.' });
 });
 
 // Inquiries
-app.get('/api/admin/inquiries', authenticateAdmin, (req, res) => {
-  const data = readData();
-  const inqs = [...data.inquiries];
-  inqs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  res.json({ success: true, inquiries: inqs });
+app.get('/api/admin/inquiries', authenticateAdmin, async (req, res) => {
+  try {
+    const allInqs = await db.getInquiries();
+    let inqs = [...allInqs];
+    inqs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    res.json({ success: true, inquiries: inqs });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error loading inquiries.' });
+  }
 });
 
-app.patch('/api/admin/inquiries/:id/status', authenticateAdmin, (req, res) => {
+app.patch('/api/admin/inquiries/:id/status', authenticateAdmin, async (req, res) => {
   const { status } = req.body;
-  const data = readData();
-  const inq = data.inquiries.find(i => i.id === req.params.id);
-
-  if (!inq) {
+  const updated = await db.updateInquiry(req.params.id, { status });
+  if (!updated) {
     return res.status(404).json({ success: false, message: 'Inquiry not found.' });
   }
-
-  if (status) inq.status = status;
-  writeData(data);
   res.json({ success: true, message: 'Inquiry status updated.' });
 });
 
-app.delete('/api/admin/inquiries/:id', authenticateAdmin, (req, res) => {
-  const data = readData();
-  data.inquiries = data.inquiries.filter(i => i.id !== req.params.id);
-  writeData(data);
+app.delete('/api/admin/inquiries/:id', authenticateAdmin, async (req, res) => {
+  const deleted = await db.deleteInquiry(req.params.id);
+  if (!deleted) {
+    return res.status(404).json({ success: false, message: 'Inquiry not found.' });
+  }
   res.json({ success: true, message: 'Inquiry deleted.' });
 });
 
 // Admin User Management
-app.get('/api/admin/users', authenticateAdmin, (req, res) => {
-  const data = readData();
-  // do not expose password hashes
-  const safeUsers = data.users.map(u => ({
-    id: u.id,
-    name: u.name,
-    email: u.email,
-    role: u.role,
-    phone: u.phone,
-    createdAt: u.createdAt
-  }));
-  res.json({ success: true, users: safeUsers });
+app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
+  try {
+    const users = await db.getUsers();
+    // do not expose password hashes
+    const safeUsers = users.map(u => ({
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      role: u.role,
+      phone: u.phone,
+      createdAt: u.createdAt
+    }));
+    res.json({ success: true, users: safeUsers });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error loading users.' });
+  }
 });
 
-app.post('/api/admin/users', authenticateAdmin, (req, res) => {
+app.post('/api/admin/users', authenticateAdmin, async (req, res) => {
   const { name, email, password, role, phone } = req.body;
   if (!name || !email || !password) {
     return res.status(400).json({ success: false, message: 'Name, email and password are required.' });
   }
 
-  const data = readData();
-  const existing = data.users.find(u => u.email.toLowerCase() === email.trim().toLowerCase());
+  const existing = await db.findUserByEmail(email);
   if (existing) {
     return res.status(400).json({ success: false, message: 'A user with this email already exists.' });
   }
@@ -1021,36 +993,35 @@ app.post('/api/admin/users', authenticateAdmin, (req, res) => {
     createdAt: new Date().toISOString()
   };
 
-  data.users.push(newUser);
-  writeData(data);
+  const created = await db.createUser(newUser);
 
   res.json({
     success: true,
     message: 'User added successfully.',
-    user: { id: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role }
+    user: { id: created.id, name: created.name, email: created.email, role: created.role }
   });
 });
 
-app.delete('/api/admin/users/:id', authenticateAdmin, (req, res) => {
-  const data = readData();
+app.delete('/api/admin/users/:id', authenticateAdmin, async (req, res) => {
   if (req.params.id === 'usr_admin') {
     return res.status(400).json({ success: false, message: 'Root Super Admin account cannot be deleted.' });
   }
 
-  data.users = data.users.filter(u => u.id !== req.params.id);
-  writeData(data);
+  const deleted = await db.deleteUser(req.params.id);
+  if (!deleted) {
+    return res.status(404).json({ success: false, message: 'User not found.' });
+  }
   res.json({ success: true, message: 'User deleted.' });
 });
 
 // Update Site Settings
-app.put('/api/admin/settings', authenticateAdmin, (req, res) => {
-  const data = readData();
-  data.settings = {
-    ...data.settings,
-    ...req.body
-  };
-  writeData(data);
-  res.json({ success: true, message: 'Settings updated successfully.', settings: data.settings });
+app.put('/api/admin/settings', authenticateAdmin, async (req, res) => {
+  try {
+    const updated = await db.updateSettings(req.body);
+    res.json({ success: true, message: 'Settings updated successfully.', settings: updated });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Failed to update settings.' });
+  }
 });
 
 // 404 handler for API
