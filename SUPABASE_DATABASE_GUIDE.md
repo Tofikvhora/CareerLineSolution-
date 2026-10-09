@@ -70,3 +70,6 @@ Render will automatically re-deploy your server with Supabase active.
   ```
 - **Candidate applications, inquiries, employer requests, and new jobs will now be saved permanently in Supabase forever!**
 - Even if Render free tier sleeps or restarts, candidate data will remain intact in the cloud.
+
+Admin id Password :admin@careerlinesolution.com
+TofikVora@2002
