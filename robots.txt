@@ -1,0 +1,63 @@
+# ========================================================
+# CareerLine Solution - robots.txt
+# Official Crawler & Anti-Bot Protection Directive
+# ========================================================
+
+User-agent: *
+# Disallow internal admin, endpoints, and uploads
+Disallow: /admin/
+Disallow: /admin
+Disallow: /api/
+Disallow: /uploads/
+Disallow: /database/
+Disallow: /scratch/
+Disallow: /*.json$
+
+# Block aggressive scraping and content harvesting bots
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+User-agent: Scrapy
+Disallow: /
+
+User-agent: TurnitinBot
+Disallow: /
+
+User-agent: SemrushBot
+Crawl-delay: 10
+
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+# Allow search engine discovery for public pages
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /uploads/
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /uploads/
+
+Sitemap: https://careerlinesolution.com/sitemap.xml

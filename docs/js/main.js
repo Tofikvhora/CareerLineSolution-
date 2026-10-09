@@ -38,6 +38,11 @@ function showToast(message, type = 'success') {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Anti-automation security token initialization
+  document.querySelectorAll('.form-render-ts').forEach(el => {
+    el.value = Date.now().toString();
+  });
+
   // Mobile Nav Toggle with Backdrop
   const toggleBtn = document.querySelector('.site-header .mobile-nav-toggle');
   const navMenu = document.querySelector('.nav-menu');

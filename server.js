@@ -5,11 +5,37 @@ const fs = require('fs');
 const multer = require('multer');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const { readData, writeData } = require('./database/db');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'careerline_secret_key_2026_super_secure';
+
+// Trust proxy if hosted behind reverse proxy / CDN (Cloudflare, Render, etc.)
+app.set('trust proxy', 1);
+
+// ========================================================
+// SECURITY HEADERS & DEFENSE (Helmet)
+// ========================================================
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com", "data:"],
+      imgSrc: ["'self'", "data:", "https:", "blob:"],
+      connectSrc: ["'self'"],
+      frameSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: null
+    }
+  },
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 
 // Ensure upload directory exists
 const uploadDir = path.join(__dirname, 'uploads', 'resumes');
@@ -32,26 +58,179 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit prevents memory exhaustion
   fileFilter: (req, file, cb) => {
     const allowed = ['.pdf', '.doc', '.docx', '.rtf', '.txt'];
     const ext = path.extname(file.originalname).toLowerCase();
+    
+    // Disallow dangerous double extension attacks (e.g. exploit.php.pdf)
+    const baseWithoutExt = path.basename(file.originalname, ext);
+    const dangerousExts = ['.php', '.exe', '.sh', '.bat', '.cmd', '.py', '.pl', '.jsp', '.asp', '.aspx', '.cgi', '.jar', '.vbs', '.js', '.html', '.htm'];
+    for (const dExt of dangerousExts) {
+      if (baseWithoutExt.toLowerCase().endsWith(dExt)) {
+        return cb(new Error('Invalid filename: double extensions are prohibited for security.'));
+      }
+    }
+
     if (allowed.includes(ext)) {
       cb(null, true);
     } else {
-      cb(new Error('Only PDF, DOC, DOCX, RTF, or TXT resumes are allowed!'));
+      cb(new Error('Only authentic PDF, DOC, DOCX, RTF, or TXT resumes are allowed!'));
     }
   }
 });
 
-// Middleware
+// Middleware with payload size limits (prevents payload DOS attacks)
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '100kb' }));
+app.use(express.urlencoded({ extended: true, limit: '100kb' }));
+
+// ========================================================
+// RATE LIMITERS (Brute-Force & Denial-of-Service Defense)
+// ========================================================
+
+// 1. General API Limiter (120 reqs/min per IP)
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many requests. Please slow down.' }
+});
+app.use('/api/', apiLimiter);
+
+// 2. Job Application Limiter (Max 5 submissions per 15 minutes per IP)
+const applyLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many job applications from this IP address. Please wait 15 minutes before submitting again.' }
+});
+
+// 3. Inquiry / Contact Limiter (Max 6 inquiries per 15 minutes per IP)
+const inquiryLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 6,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many messages sent from this IP address. Please wait a few minutes before trying again.' }
+});
+
+// 4. Admin Login Brute Force Limiter (Max 5 failed attempts per 15 mins per IP)
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many login attempts. Access temporarily locked for 15 minutes for security.' }
+});
+
+// ========================================================
+// ANTI-BOT & ANTI-AUTOMATION VERIFICATION MIDDLEWARE
+// ========================================================
+const BLOCKED_BOT_AGENTS = [
+  /sqlmap/i, /nikto/i, /wpscan/i, /masscan/i, /zgrab/i,
+  /acunetix/i, /havij/i, /dirbuster/i, /nmap/i,
+  /scrapy/i, /aiohttp/i, /libwww-perl/i, /httpclient/i
+];
+
+function verifyAntiBot(req, res, next) {
+  const ua = req.get('user-agent') || '';
+  
+  // 1. Check for malicious scanner / scraper User Agents
+  for (const pattern of BLOCKED_BOT_AGENTS) {
+    if (pattern.test(ua)) {
+      console.warn(`[SECURITY] Blocked automated scanner: "${ua}" from IP: ${req.ip}`);
+      return res.status(403).json({ success: false, message: 'Automated scraping and bot access is prohibited.' });
+    }
+  }
+
+  // 2. Honeypot check (hidden fields filled by automated form-filling scripts)
+  const honeypot = req.body._hp_website_verification || req.body._hp_company_field || req.body.fax_number;
+  if (honeypot && String(honeypot).trim() !== '') {
+    console.warn(`[SECURITY] Honeypot triggered by automated bot from IP: ${req.ip}`);
+    return res.status(400).json({ success: false, message: 'Automated submission rejected.' });
+  }
+
+  // 3. Form submission velocity check (anti-headless-bot timing)
+  if (req.body._form_render_ts) {
+    const renderTs = Number(req.body._form_render_ts);
+    const now = Date.now();
+    // Submissions faster than 1.5s are automated bots
+    if (!isNaN(renderTs) && (now - renderTs < 1500)) {
+      console.warn(`[SECURITY] Velocity bot flag (${now - renderTs}ms) from IP: ${req.ip}`);
+      return res.status(400).json({ success: false, message: 'Submission was too fast. Please take a moment and submit again.' });
+    }
+  }
+
+  next();
+}
+
+// ========================================================
+// FILE SIGNATURE (MAGIC BYTES) & SANITIZATION HELPERS
+// ========================================================
+function validateFileSignature(filePath, originalname) {
+  try {
+    const ext = path.extname(originalname).toLowerCase();
+    if (!fs.existsSync(filePath)) {
+      return { valid: false, reason: 'Uploaded file not found on disk.' };
+    }
+
+    const fd = fs.openSync(filePath, 'r');
+    const buffer = Buffer.alloc(16);
+    const bytesRead = fs.readSync(fd, buffer, 0, 16, 0);
+    fs.closeSync(fd);
+
+    if (bytesRead < 4) {
+      return { valid: false, reason: 'Uploaded file is empty or corrupted.' };
+    }
+
+    // PDF Magic Bytes: %PDF- (0x25 0x50 0x44 0x46)
+    if (ext === '.pdf') {
+      const isPdf = buffer[0] === 0x25 && buffer[1] === 0x50 && buffer[2] === 0x44 && buffer[3] === 0x46;
+      if (!isPdf) return { valid: false, reason: 'File signature mismatch: File is not a valid PDF document.' };
+    }
+
+    // DOCX Magic Bytes: PK (ZIP container 0x50 0x4B 0x03 0x04)
+    if (ext === '.docx') {
+      const isZip = buffer[0] === 0x50 && buffer[1] === 0x4B && buffer[2] === 0x03 && buffer[3] === 0x04;
+      if (!isZip) return { valid: false, reason: 'File signature mismatch: File is not a valid DOCX document.' };
+    }
+
+    // RTF Magic Bytes: {\\rtf (0x7B 0x5C 0x72 0x74 0x66)
+    if (ext === '.rtf') {
+      const isRtf = buffer[0] === 0x7B && buffer[1] === 0x5C && buffer[2] === 0x72 && buffer[3] === 0x74 && buffer[4] === 0x66;
+      if (!isRtf) return { valid: false, reason: 'File signature mismatch: File is not a valid RTF document.' };
+    }
+
+    // Plain text: reject binary null bytes
+    if (ext === '.txt') {
+      for (let i = 0; i < bytesRead; i++) {
+        if (buffer[i] === 0) return { valid: false, reason: 'Binary contents detected in plain text file.' };
+      }
+    }
+
+    return { valid: true };
+  } catch (err) {
+    return { valid: false, reason: 'Integrity check failed: ' + err.message };
+  }
+}
+
+function sanitizeInput(val) {
+  if (typeof val !== 'string') return val;
+  return val.replace(/[<>]/g, '').trim();
+}
 
 // Serve static frontend files
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Secure static uploads serving (strictly prevents browser script execution)
+app.use('/uploads', (req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Content-Security-Policy', "default-src 'none'");
+  next();
+}, express.static(path.join(__dirname, 'uploads')));
 
 // Clean page URL routes
 app.get('/jobs', (req, res) => res.sendFile(path.join(__dirname, 'public', 'jobs.html')));
@@ -59,6 +238,8 @@ app.get('/about', (req, res) => res.sendFile(path.join(__dirname, 'public', 'abo
 app.get('/services', (req, res) => res.sendFile(path.join(__dirname, 'public', 'services.html')));
 app.get('/employers', (req, res) => res.sendFile(path.join(__dirname, 'public', 'employers.html')));
 app.get('/contact', (req, res) => res.sendFile(path.join(__dirname, 'public', 'contact.html')));
+app.get('/privacy', (req, res) => res.sendFile(path.join(__dirname, 'public', 'privacy.html')));
+app.get('/terms', (req, res) => res.sendFile(path.join(__dirname, 'public', 'terms.html')));
 app.get('/logo-preview', (req, res) => res.sendFile(path.join(__dirname, 'public', 'logo-preview.html')));
 app.get('/admin/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'login.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin', 'index.html')));
@@ -202,13 +383,13 @@ app.get('/api/job-meta', (req, res) => {
   });
 });
 
-// 5. Submit Candidate Job Application
-app.post('/api/apply', (req, res) => {
+// 5. Submit Candidate Job Application (Protected with rate limiting, anti-bot, magic byte checks)
+app.post('/api/apply', applyLimiter, (req, res) => {
   upload.single('resume')(req, res, (uploadErr) => {
     if (uploadErr) {
       if (uploadErr instanceof multer.MulterError) {
         if (uploadErr.code === 'LIMIT_FILE_SIZE') {
-          return res.status(400).json({ success: false, message: 'Resume file is too large. Maximum size allowed is 10MB.' });
+          return res.status(400).json({ success: false, message: 'Resume file is too large. Maximum size allowed is 5MB.' });
         }
         return res.status(400).json({ success: false, message: `Upload error: ${uploadErr.message}` });
       }
@@ -216,21 +397,45 @@ app.post('/api/apply', (req, res) => {
     }
 
     try {
-      const {
-        jobId,
-        fullName,
-        email,
-        phone,
-        currentLocation,
-        experience,
-        currentCTC,
-        expectedCTC,
-        noticePeriod,
-        skills,
-        coverNote
-      } = req.body;
+      // 1. Anti-Bot and Honeypot Verification
+      const honeypot = req.body._hp_website_verification || req.body._hp_company_field || req.body.fax_number;
+      if (honeypot && String(honeypot).trim() !== '') {
+        if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        return res.status(400).json({ success: false, message: 'Automated submission rejected.' });
+      }
+
+      if (req.body._form_render_ts) {
+        const renderTs = Number(req.body._form_render_ts);
+        const now = Date.now();
+        if (!isNaN(renderTs) && (now - renderTs < 1500)) {
+          if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+          return res.status(400).json({ success: false, message: 'Submission was too fast. Please take a moment and re-submit.' });
+        }
+      }
+
+      // 2. File Signature & Magic Bytes Verification
+      if (req.file) {
+        const check = validateFileSignature(req.file.path, req.file.originalname);
+        if (!check.valid) {
+          if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+          return res.status(400).json({ success: false, message: check.reason });
+        }
+      }
+
+      const jobId = sanitizeInput(req.body.jobId);
+      const fullName = sanitizeInput(req.body.fullName);
+      const email = sanitizeInput(req.body.email);
+      const phone = sanitizeInput(req.body.phone);
+      const currentLocation = sanitizeInput(req.body.currentLocation);
+      const experience = sanitizeInput(req.body.experience);
+      const currentCTC = sanitizeInput(req.body.currentCTC);
+      const expectedCTC = sanitizeInput(req.body.expectedCTC);
+      const noticePeriod = sanitizeInput(req.body.noticePeriod);
+      const skills = sanitizeInput(req.body.skills);
+      const coverNote = sanitizeInput(req.body.coverNote);
 
       if (!fullName || !email || !phone) {
+        if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
         return res.status(400).json({ success: false, message: 'Please provide full name, email and phone number.' });
       }
 
@@ -275,22 +480,20 @@ app.post('/api/apply', (req, res) => {
   });
 });
 
-// 6. Submit Employer Staffing Requirement
-app.post('/api/employer-request', (req, res) => {
+// 6. Submit Employer Staffing Requirement (Protected with inquiryLimiter & verifyAntiBot)
+app.post('/api/employer-request', inquiryLimiter, verifyAntiBot, (req, res) => {
   try {
-    const {
-      companyName,
-      contactPerson,
-      designation,
-      email,
-      phone,
-      city,
-      serviceType,
-      positionsNeeded,
-      roles,
-      urgency,
-      details
-    } = req.body;
+    const companyName = sanitizeInput(req.body.companyName);
+    const contactPerson = sanitizeInput(req.body.contactPerson);
+    const designation = sanitizeInput(req.body.designation);
+    const email = sanitizeInput(req.body.email);
+    const phone = sanitizeInput(req.body.phone);
+    const city = sanitizeInput(req.body.city);
+    const serviceType = sanitizeInput(req.body.serviceType);
+    const positionsNeeded = sanitizeInput(req.body.positionsNeeded);
+    const roles = sanitizeInput(req.body.roles);
+    const urgency = sanitizeInput(req.body.urgency);
+    const details = sanitizeInput(req.body.details);
 
     if (!companyName || !contactPerson || !email || !phone) {
       return res.status(400).json({ success: false, message: 'Company name, contact person, email, and phone are required.' });
@@ -328,10 +531,15 @@ app.post('/api/employer-request', (req, res) => {
   }
 });
 
-// 7. General Contact Form
-app.post('/api/contact', (req, res) => {
+// 7. General Contact Form (Protected with inquiryLimiter & verifyAntiBot)
+app.post('/api/contact', inquiryLimiter, verifyAntiBot, (req, res) => {
   try {
-    const { name, email, phone, subject, message } = req.body;
+    const name = sanitizeInput(req.body.name);
+    const email = sanitizeInput(req.body.email);
+    const phone = sanitizeInput(req.body.phone);
+    const subject = sanitizeInput(req.body.subject);
+    const message = sanitizeInput(req.body.message);
+
     if (!name || !email || !message) {
       return res.status(400).json({ success: false, message: 'Name, email and message are required.' });
     }
@@ -365,8 +573,8 @@ app.post('/api/contact', (req, res) => {
 // ADMIN AUTHENTICATION
 // -------------------------------------------------------------
 
-// Admin Login
-app.post('/api/admin/login', (req, res) => {
+// Admin Login (Protected with loginLimiter against brute-force attacks)
+app.post('/api/admin/login', loginLimiter, (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res.status(400).json({ success: false, message: 'Email and password are required.' });

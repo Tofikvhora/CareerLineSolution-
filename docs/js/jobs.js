@@ -458,6 +458,9 @@ window.openApplyModal = function(jobId, jobTitle) {
   if (targetJobIdInput) targetJobIdInput.value = jobId || 'general';
   if (targetJobTitleDisplay) targetJobTitleDisplay.innerText = jobTitle || 'General Application';
 
+  const tsField = modal?.querySelector('.form-render-ts');
+  if (tsField) tsField.value = Date.now().toString();
+
   if (modal) modal.classList.add('open');
 };
 
