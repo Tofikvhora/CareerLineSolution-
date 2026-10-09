@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="ogBg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#061D47"/>
+      <stop offset="60%" stop-color="#0B3378"/>
+      <stop offset="100%" stop-color="#144A9E"/>
+    </linearGradient>
+    <linearGradient id="ogGold2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="50%" stop-color="#FB923C"/>
+      <stop offset="100%" stop-color="#EA580C"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#ogBg2)"/>
+
+  <!-- Top Pill -->
+  <g transform="translate(100, 80)">
+    <rect width="400" height="42" rx="21" fill="rgba(251, 146, 60, 0.15)" stroke="#FB923C" stroke-width="1.5"/>
+    <circle cx="24" cy="21" r="6" fill="#10B981"/>
+    <text x="42" y="27" font-family="'Inter', sans-serif" font-weight="700" font-size="15" fill="#FED7AA" letter-spacing="1">
+      TALENT • GROWTH • SUCCESS
+    </text>
+  </g>
+
+  <!-- Heading -->
+  <g transform="translate(100, 200)">
+    <text font-family="'Inter', -apple-system, sans-serif" font-weight="900" font-size="64" fill="#FFFFFF" letter-spacing="-1">
+      CareerLine<tspan fill="url(#ogGold2)">Solutions</tspan>
+    </text>
+    <text y="70" font-family="'Inter', -apple-system, sans-serif" font-weight="700" font-size="32" fill="#93C5FD">
+      Premier Pan-India HR &amp; Recruitment Consultancy
+    </text>
+    <text y="125" font-family="'Inter', sans-serif" font-weight="400" font-size="20" fill="#CBD5E1">
+      Permanent Recruitment • Executive Search • Manpower Supply • RPO
+    </text>
+  </g>
+
+  <!-- Stats Cards -->
+  <g transform="translate(100, 440)">
+    <g>
+      <rect width="210" height="96" rx="14" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)"/>
+      <text x="24" y="44" font-family="'Inter', sans-serif" font-weight="800" font-size="28" fill="url(#ogGold2)">15,000+</text>
+      <text x="24" y="74" font-family="'Inter', sans-serif" font-weight="500" font-size="14" fill="#94A3B8">Placements</text>
+    </g>
+    <g transform="translate(230, 0)">
+      <rect width="210" height="96" rx="14" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)"/>
+      <text x="24" y="44" font-family="'Inter', sans-serif" font-weight="800" font-size="28" fill="#FFFFFF">500+</text>
+      <text x="24" y="74" font-family="'Inter', sans-serif" font-weight="500" font-size="14" fill="#94A3B8">Corporate Clients</text>
+    </g>
+    <g transform="translate(460, 0)">
+      <rect width="210" height="96" rx="14" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)"/>
+      <text x="24" y="44" font-family="'Inter', sans-serif" font-weight="800" font-size="28" fill="url(#ogGold2)">28+ States</text>
+      <text x="24" y="74" font-family="'Inter', sans-serif" font-weight="500" font-size="14" fill="#94A3B8">Pan-India Reach</text>
+    </g>
+    <g transform="translate(690, 0)">
+      <rect width="210" height="96" rx="14" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)"/>
+      <text x="24" y="44" font-family="'Inter', sans-serif" font-weight="800" font-size="28" fill="#10B981">100% Free</text>
+      <text x="24" y="74" font-family="'Inter', sans-serif" font-weight="500" font-size="14" fill="#94A3B8">For Job Seekers</text>
+    </g>
+  </g>
+
+  <!-- Decorative Hexagon Badge on the right -->
+  <g transform="translate(920, 100) scale(2.8)">
+    <polygon points="60,6 110,33 110,87 60,114 10,87 10,33" fill="none" stroke="url(#ogGold2)" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M 19 82 C 34 80, 51 74, 66 62 C 78 51, 91 36, 101 18" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
+    <polygon points="90,21 112,12 104,33" fill="#FFFFFF"/>
+    <circle cx="41" cy="53" r="3" fill="#93C5FD"/>
+    <circle cx="56" cy="46" r="3.5" fill="#93C5FD"/>
+    <circle cx="71" cy="38" r="4" fill="url(#ogGold2)"/>
+  </g>
+</svg>

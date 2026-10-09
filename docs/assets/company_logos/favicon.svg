@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 110" width="100%" height="100%">
+  <!-- Favicon Tab Icon -->
+  <polygon points="55,6 101,32 101,84 55,110 9,84 9,32" stroke="#0E4294" stroke-width="10" fill="#FFFFFF" stroke-linejoin="round"/>
+  <path d="M 55 6 L 101 32 L 101 54" stroke="#E59123" stroke-width="10" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- Ascending Figures -->
+  <circle cx="39" cy="51" r="4.2" fill="#E59123"/>
+  <path d="M 34.5 58 C 34.5 55.5, 43.5 55.5, 43.5 58 L 43.5 69 L 34.5 69 Z" fill="#E59123"/>
+  <circle cx="52.5" cy="43" r="4.8" fill="#E59123"/>
+  <path d="M 47.5 51 C 47.5 48.5, 57.5 48.5, 57.5 51 L 57.5 67 L 47.5 67 Z" fill="#E59123"/>
+  <circle cx="67" cy="34" r="5.5" fill="#E59123"/>
+  <path d="M 61.5 43 C 61.5 39.5, 72.5 39.5, 72.5 43 L 72.5 65 L 61.5 65 Z" fill="#E59123"/>
+
+  <!-- Highway Curve -->
+  <path d="M 13 83 C 29 81, 47 75, 62 62 C 75 51, 88 34, 99 17" stroke="#0E4294" stroke-width="13" fill="none" stroke-linecap="round"/>
+  <path d="M 15 84 C 31 82, 49 76, 63 63 C 76 52, 86 37, 95 20" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+  <!-- Dual Arrow Head -->
+  <polygon points="82,23 107,11 96,36" fill="#0E4294"/>
+  <polygon points="86,18 107,11 95,29 90,21" fill="#E59123"/>
+
+  <!-- Gold Accent -->
+  <path d="M 73 80 L 84 64" stroke="#E59123" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <polygon points="78,63 87,60 85,70" fill="#E59123"/>
+</svg>

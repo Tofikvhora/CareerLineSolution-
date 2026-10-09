@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 120" width="100%" height="100%">
+  <!-- ========================================================
+       CareerLineSolutions - Official Dark Theme Vector Brand Logo
+       Optimized for Dark Footers & Deep Midnight Navy Backgrounds
+       ======================================================== -->
+  <defs>
+    <style>
+      .cls-dark-blue { fill: #60A5FA; }
+      .cls-dark-gold { fill: #FBBF24; }
+      .cls-dark-stroke-blue { stroke: #60A5FA; fill: none; stroke-linejoin: round; }
+      .cls-dark-stroke-gold { stroke: #FBBF24; fill: none; stroke-linejoin: round; }
+    </style>
+  </defs>
+
+  <!-- Left: Official Hexagon Talent Shield (Dark Theme) -->
+  <g transform="translate(14, 10)">
+    <!-- Outer Hexagon Frame -->
+    <polygon points="50,4 92,27 92,73 50,96 8,73 8,27" class="cls-dark-stroke-blue" stroke-width="8.5"/>
+    <!-- Top-Right Accent Gold Bevel -->
+    <path d="M 50 4 L 92 27 L 92 46" class="cls-dark-stroke-gold" stroke-width="8.5" stroke-linecap="round"/>
+
+    <!-- 3 Ascending Talent Figures (Bright Gold) -->
+    <circle cx="35" cy="45" r="3.6" class="cls-dark-gold"/>
+    <path d="M 31 51 C 31 49, 39 49, 39 51 L 39 61 L 31 61 Z" class="cls-dark-gold"/>
+
+    <circle cx="47" cy="38" r="4.2" class="cls-dark-gold"/>
+    <path d="M 42.5 45 C 42.5 42.5, 51.5 42.5, 51.5 45 L 51.5 59 L 42.5 59 Z" class="cls-dark-gold"/>
+
+    <circle cx="60" cy="30" r="4.8" class="cls-dark-gold"/>
+    <path d="M 55 38 C 55 35, 65 35, 65 38 L 65 57 L 55 57 Z" class="cls-dark-gold"/>
+
+    <!-- Dynamic Highway Pathway -->
+    <path d="M 12 73 C 26 71, 42 66, 56 54 C 68 44, 80 28, 90 13" class="cls-dark-stroke-blue" stroke-width="11" stroke-linecap="round"/>
+    <path d="M 14 74 C 28 72, 44 67, 57 55 C 69 45, 78 31, 86 16" stroke="#071E47" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+    <!-- Breakout Arrow Head: Dual-Tone Gold + Light Blue -->
+    <polygon points="76,19 98,8 89,30" class="cls-dark-blue"/>
+    <polygon points="79,16 98,8 87,24 83,18" class="cls-dark-gold"/>
+
+    <!-- Lower Gold Accent Path Line -->
+    <path d="M 66 70 L 76 56" class="cls-dark-stroke-gold" stroke-width="4.5" stroke-linecap="round"/>
+    <polygon points="71,55 79,52 77,61" class="cls-dark-gold"/>
+  </g>
+
+  <!-- Right: Official Typography (Dark Theme) -->
+  <g transform="translate(132, 20)">
+    <!-- Primary Company Name Line 1 -->
+    <text x="0" y="38" font-family="'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="33" letter-spacing="-0.5" fill="#FFFFFF">
+      CAREERLINE
+    </text>
+
+    <!-- Primary Company Name Line 2 -->
+    <text x="0" y="70" font-family="'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif" font-weight="400" font-size="33" letter-spacing="4.5" fill="#FFFFFF">
+      SOLUTIONS
+    </text>
+
+    <!-- Official Tagline -->
+    <g transform="translate(0, 84)">
+      <text x="1" y="11" font-family="'Inter', -apple-system, 'Segoe UI', sans-serif" font-weight="800" font-size="11.5" letter-spacing="3.2" fill="#FBBF24">
+        TALENT. GROWTH. SUCCESS.
+      </text>
+    </g>
+
+    <!-- Pan-India Badge Tag -->
+    <g transform="translate(290, 82)">
+      <rect x="0" y="0" width="100" height="15" rx="7.5" fill="rgba(251, 191, 36, 0.15)" stroke="#FBBF24" stroke-width="1"/>
+      <text x="50" y="11" text-anchor="middle" font-family="'Inter', sans-serif" font-weight="800" font-size="8.5" fill="#FDE68A" letter-spacing="0.5">
+        PAN-INDIA HR
+      </text>
+    </g>
+  </g>
+</svg>

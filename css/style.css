@@ -218,6 +218,29 @@ body.menu-open .top-bar {
   flex-shrink: 0;
 }
 
+.site-nav-logo {
+  height: 48px;
+  max-height: 52px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  transition: transform 0.2s ease;
+}
+
+.site-nav-logo:hover {
+  transform: scale(1.02);
+}
+
+@media (max-width: 768px) {
+  .site-nav-logo {
+    height: 42px;
+    max-height: 44px;
+  }
+}
+
 .brand-icon-box {
   width: 44px;
   height: 44px;

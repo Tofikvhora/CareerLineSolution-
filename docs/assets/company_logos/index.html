@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CareerLineSolutions - Official Brand Identity & Logo Suite</title>
+  <link rel="icon" type="image/svg+xml" href="assets/company_logos/favicon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #0E4294;
+      --primary-dark: #071E47;
+      --secondary: #1E60B5;
+      --accent: #E59123;
+      --accent-gold: #F59E0B;
+      --bg: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --text: #1E293B;
+      --text-muted: #64748B;
+      --border: #E2E8F0;
+      --shadow: 0 10px 25px -5px rgba(14, 66, 148, 0.08), 0 8px 10px -6px rgba(14, 66, 148, 0.04);
+    }
+
+    body.dark-mode {
+      --bg: #0B132B;
+      --card-bg: #1C2541;
+      --text: #F1F5F9;
+      --text-muted: #94A3B8;
+      --border: #334155;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 80px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      background: #071E47;
+      color: #FFF;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .top-bar a { color: #F59E0B; text-decoration: none; font-weight: 600; }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #071E47 0%, #0E4294 60%, #1E60B5 100%);
+      color: #FFF;
+      padding: 55px 24px 45px;
+      text-align: center;
+      position: relative;
+    }
+    .badge-client {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 18px;
+      background: rgba(229, 145, 35, 0.25);
+      border: 1.5px solid #E59123;
+      color: #FED7AA;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .header h1 {
+      font-size: 40px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+    .header h1 span { color: #F59E0B; }
+    .header p {
+      font-size: 17px;
+      color: #CBD5E1;
+      max-width: 760px;
+      margin: 0 auto 24px;
+    }
+
+    .filter-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .tab-btn {
+      padding: 10px 22px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.12);
+      color: #FFF;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tab-btn:hover, .tab-btn.active {
+      background: #E59123;
+      color: #FFF;
+      border-color: #E59123;
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 40px 20px 0;
+    }
+
+    .section-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    body.dark-mode .section-title { color: #60A5FA; }
+
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 15px;
+      margin-bottom: 28px;
+    }
+
+    /* Hero Chosen Card */
+    .hero-chosen-card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      box-shadow: 0 20px 40px -10px rgba(14, 66, 148, 0.15);
+      padding: 36px;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 36px;
+      align-items: center;
+      margin-bottom: 50px;
+      border: 2px solid var(--border);
+    }
+    @media (max-width: 900px) {
+      .hero-chosen-card { grid-template-columns: 1fr; text-align: center; }
+      .hero-chosen-img { margin: 0 auto; }
+    }
+    .hero-chosen-img {
+      background: #FFFFFF;
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+    }
+    .hero-chosen-img img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+      object-fit: contain;
+    }
+    .tag-chosen {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      color: #FFF;
+      margin-bottom: 12px;
+    }
+    .hero-chosen-info h2 {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--primary);
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+    body.dark-mode .hero-chosen-info h2 { color: #93C5FD; }
+    .hero-chosen-info p {
+      font-size: 15.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .variants-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .variant-chip {
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      background: #F1F5F9;
+      color: #334155;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      border: 1px solid var(--border);
+    }
+    body.dark-mode .variant-chip {
+      background: #0F172A;
+      color: #CBD5E1;
+    }
+    .variant-chip:hover {
+      background: var(--primary);
+      color: #FFF;
+      border-color: var(--primary);
+    }
+
+    .btn-select {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 12px;
+      background: var(--primary);
+      color: #FFF;
+      font-weight: 700;
+      font-size: 14.5px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-select:hover {
+      background: #0A3273;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(14, 66, 148, 0.25);
+    }
+
+    /* Production Vector Assets Grid */
+    .assets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 24px;
+      margin-bottom: 50px;
+    }
+    .asset-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .asset-preview {
+      height: 140px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+    }
+    .bg-light-preview { background: #FFFFFF; }
+    .bg-dark-preview { background: #071E47; }
+    .asset-preview img {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+    }
+    .asset-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+    body.dark-mode .asset-title { color: #60A5FA; }
+    .asset-info {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+    .asset-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      border-radius: 10px;
+      background: #F1F5F9;
+      color: var(--primary);
+      font-size: 13.5px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: 1px solid var(--border);
+      justify-content: center;
+    }
+    body.dark-mode .asset-btn {
+      background: #0F172A;
+      color: #93C5FD;
+    }
+    .asset-btn:hover {
+      background: var(--primary);
+      color: #FFF;
+      border-color: var(--primary);
+    }
+
+    /* Color Palette */
+    .color-swatches {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 50px;
+    }
+    .swatch {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .swatch-color { height: 80px; }
+    .swatch-info { padding: 14px; }
+    .swatch-name { font-weight: 800; font-size: 14px; margin-bottom: 2px; }
+    .swatch-hex { font-family: monospace; font-size: 13px; color: var(--text-muted); }
+
+    /* Code Box */
+    .code-box {
+      background: #0B132B;
+      color: #F8FAFC;
+      border-radius: 16px;
+      padding: 24px;
+      margin-top: 30px;
+      overflow-x: auto;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 13.5px;
+      border: 1px solid #1E293B;
+      margin-bottom: 50px;
+    }
+    .code-box h3 {
+      color: #F59E0B;
+      margin-bottom: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 18px;
+    }
+    .code-box pre {
+      background: #07101E;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 12px;
+      color: #7DD3FC;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div><strong>CareerLineSolutions</strong> — Official Corporate Brand Identity &amp; Logo Suite</div>
+    <div>
+      <a href="index.html" style="margin-right: 18px;"><i class="fas fa-arrow-left"></i> Back to Live Website</a>
+      <a href="javascript:void(0)" onclick="toggleDarkMode()"><i class="fas fa-moon"></i> Toggle Dark/Light</a>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="badge-client"><i class="fas fa-check-circle"></i> Official Approved Client Brand Mark</div>
+    <h1>CareerLine<span>Solutions</span> Brand Identity</h1>
+    <p>Official, client-approved corporate logo suite for <strong>CareerLineSolutions</strong> (Pan-India HR &amp; Staffing Consultancy) featuring the iconic <strong>Hexagon Talent Progression Shield</strong> and official tagline <em>TALENT. GROWTH. SUCCESS.</em></p>
+
+    <div class="filter-tabs">
+      <a href="#master-brand" class="tab-btn active"><i class="fas fa-star"></i> Primary Brand Mark</a>
+      <a href="#vectors" class="tab-btn"><i class="fas fa-vector-square"></i> Vector SVGs</a>
+      <a href="#transparent-pngs" class="tab-btn"><i class="fas fa-file-image"></i> Transparent PNGs</a>
+      <a href="#office-showcase" class="tab-btn"><i class="fas fa-camera"></i> Corporate Office Showcase</a>
+      <a href="#colors" class="tab-btn"><i class="fas fa-palette"></i> Brand Colors</a>
+      <a href="javascript:void(0)" class="tab-btn mode-toggle" onclick="toggleDarkMode()"><i class="fas fa-circle-half-stroke"></i> Dark/Light Mode</a>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- Client Approved Hero Showcase -->
+    <div id="master-brand" style="padding-top: 20px;">
+      <div class="hero-chosen-card" style="border: 3px solid #0E4294;">
+        <div class="hero-chosen-img" style="background: #FFFFFF;">
+          <img src="assets/company_logos/careerline-logo-card.png" alt="Official Approved Logo: Hexagon Talent Progression Shield">
+        </div>
+        <div class="hero-chosen-info">
+          <span class="tag-chosen" style="background: #0E4294;"><i class="fas fa-check-circle"></i> CLIENT-APPROVED PRIMARY LOGO</span>
+          <h2>The Hexagon Talent Progression Shield</h2>
+          <p>
+            The authoritative brand identity for <strong>CareerLineSolutions</strong>. Features an executive geometric hexagon in royal blue with an amber gold accent corner, 3 ascending talent silhouettes, an accelerating highway pathway, and a breakout growth arrow, underscored by <strong>CAREERLINE SOLUTIONS</strong> and the signature tagline <strong>TALENT. GROWTH. SUCCESS.</strong>
+          </p>
+          <div class="variants-row">
+            <a href="assets/company_logos/careerline-logo-flat-2d-transparent.png" target="_blank" class="variant-chip"><i class="fas fa-file-image"></i> Transparent Full Master PNG</a>
+            <a href="assets/company_logos/careerline-logo-icon-transparent.png" target="_blank" class="variant-chip"><i class="fas fa-gem"></i> Transparent Icon PNG</a>
+            <a href="assets/company_logos/careerline-logo-primary.svg" target="_blank" class="variant-chip"><i class="fas fa-bezier-curve"></i> Primary Vector SVG</a>
+            <a href="assets/company_logos/careerline-logo-dark.svg" target="_blank" class="variant-chip"><i class="fas fa-moon"></i> Dark Theme Vector SVG</a>
+            <a href="assets/company_logos/favicon.svg" target="_blank" class="variant-chip"><i class="fas fa-globe"></i> Browser Favicon</a>
+          </div>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="index.html" class="btn-select" style="max-width: 260px; text-decoration: none;">
+              <i class="fas fa-globe"></i> View Live on Website
+            </a>
+            <a href="assets/company_logos/careerline-logo-flat-2d-transparent.png" download class="variant-chip" style="background: #FFF; border-color: #CBD5E1; color: var(--primary);">
+              <i class="fas fa-download"></i> Download Master PNG (1024x1024)
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Production Vectors Section -->
+    <div id="vectors">
+      <h2 class="section-title"><i class="fas fa-layer-group"></i> Official Vector Assets (Header / Footer / Favicon)</h2>
+      <p class="section-desc">Zero-loss SVG vector graphics crafted for website headers, navigation bars, footers, and browser tab branding.</p>
+
+      <div class="assets-grid">
+        <!-- Asset 1: Primary Horizontal Logo -->
+        <div class="asset-card">
+          <div class="asset-preview bg-light-preview">
+            <img src="assets/company_logos/careerline-logo-primary.svg" alt="Primary Logo">
+          </div>
+          <div class="asset-title">Primary Horizontal Header Logo</div>
+          <div class="asset-info">Official Hexagon crest + CAREERLINE SOLUTIONS + TALENT. GROWTH. SUCCESS. for light navbar headers.</div>
+          <a href="assets/company_logos/careerline-logo-primary.svg" target="_blank" class="asset-btn"><i class="fas fa-external-link-alt"></i> View / Download SVG</a>
+        </div>
+
+        <!-- Asset 2: Dark Background Logo -->
+        <div class="asset-card">
+          <div class="asset-preview bg-dark-preview">
+            <img src="assets/company_logos/careerline-logo-dark.svg" alt="Dark Logo">
+          </div>
+          <div class="asset-title">Dark Theme Footer Logo</div>
+          <div class="asset-info">Crisp white typography with glowing gold accents optimized for deep midnight blue footers.</div>
+          <a href="assets/company_logos/careerline-logo-dark.svg" target="_blank" class="asset-btn"><i class="fas fa-external-link-alt"></i> View / Download SVG</a>
+        </div>
+
+        <!-- Asset 3: Square Icon Mark -->
+        <div class="asset-card">
+          <div class="asset-preview bg-light-preview">
+            <img src="assets/company_logos/careerline-logo-icon.svg" alt="Icon Mark" style="max-height: 75px;">
+          </div>
+          <div class="asset-title">Hexagon Talent Icon Mark</div>
+          <div class="asset-info">Standalone brand symbol for mobile navigation, social avatars, WhatsApp, and app icons.</div>
+          <a href="assets/company_logos/careerline-logo-icon.svg" target="_blank" class="asset-btn"><i class="fas fa-external-link-alt"></i> View / Download SVG</a>
+        </div>
+
+        <!-- Asset 4: Verified Badge -->
+        <div class="asset-card">
+          <div class="asset-preview bg-light-preview">
+            <img src="assets/company_logos/careerline-badge-verified.svg" alt="Verified Badge" style="max-height: 75px;">
+          </div>
+          <div class="asset-title">100% Verified Pan-India Badge</div>
+          <div class="asset-info">Corporate trust stamp for the landing page hero and employer recruitment sections.</div>
+          <a href="assets/company_logos/careerline-badge-verified.svg" target="_blank" class="asset-btn"><i class="fas fa-external-link-alt"></i> View / Download SVG</a>
+        </div>
+
+        <!-- Asset 5: Open Graph Banner -->
+        <div class="asset-card">
+          <div class="asset-preview bg-dark-preview">
+            <img src="assets/company_logos/careerline-og-banner.svg" alt="OG Banner">
+          </div>
+          <div class="asset-title">1200×630 Social Share Banner</div>
+          <div class="asset-info">Preview card for WhatsApp links, LinkedIn shares, and Twitter metadata.</div>
+          <a href="assets/company_logos/careerline-og-banner.svg" target="_blank" class="asset-btn"><i class="fas fa-external-link-alt"></i> View / Download SVG</a>
+        </div>
+
+        <!-- Asset 6: Favicon -->
+        <div class="asset-card">
+          <div class="asset-preview bg-light-preview">
+            <img src="assets/company_logos/favicon.svg" alt="Favicon" style="max-height: 52px;">
+          </div>
+          <div class="asset-title">Browser Tab Favicon</div>
+          <div class="asset-info">High-clarity SVG and multi-size .ico package for all browser tabs and mobile bookmarks.</div>
+          <a href="assets/company_logos/favicon.ico" download class="asset-btn"><i class="fas fa-download"></i> Download Favicon (.ico)</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transparent PNG Master Section -->
+    <div id="transparent-pngs">
+      <h2 class="section-title"><i class="fas fa-file-image"></i> High-Resolution Transparent PNG Assets</h2>
+      <p class="section-desc">Transparent background PNG files with antialiased edges ready for print, social media, and web layouts.</p>
+
+      <div class="assets-grid">
+        <div class="asset-card">
+          <div class="asset-preview bg-light-preview">
+            <img src="assets/company_logos/careerline-logo-flat-2d-transparent.png" alt="Full Master PNG">
+          </div>
+          <div class="asset-title">Master Logo (Full Layout 1024x1024)</div>
+          <div class="asset-info">Hexagon emblem + CAREERLINE SOLUTIONS + TALENT. GROWTH. SUCCESS. on transparent background.</div>
+          <a href="assets/company_logos/careerline-logo-flat-2d-transparent.png" download class="asset-btn"><i class="fas fa-download"></i> Download Transparent PNG</a>
+        </div>
+
+        <div class="asset-card">
+          <div class="asset-preview bg-light-preview">
+            <img src="assets/company_logos/careerline-logo-icon-transparent.png" alt="Icon Only PNG" style="max-height: 75px;">
+          </div>
+          <div class="asset-title">Master Hexagon Emblem (1024x1024)</div>
+          <div class="asset-info">Isolated hexagon mark with ascending talent figures and breakout arrow on transparent background.</div>
+          <a href="assets/company_logos/careerline-logo-icon-transparent.png" download class="asset-btn"><i class="fas fa-download"></i> Download Transparent Icon PNG</a>
+        </div>
+
+        <div class="asset-card">
+          <div class="asset-preview bg-light-preview">
+            <img src="assets/company_logos/careerline-logo-card.png" alt="Official Card Image" style="max-height: 90px;">
+          </div>
+          <div class="asset-title">Official Brand Card Image</div>
+          <div class="asset-info">Clean presentation card matching client's approved reference image on white background.</div>
+          <a href="assets/company_logos/careerline-logo-card.png" download class="asset-btn"><i class="fas fa-download"></i> Download Card Image</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Office Showcase Imagery -->
+    <div id="office-showcase">
+      <h2 class="section-title"><i class="fas fa-camera"></i> Corporate Office Showcase Featuring Official Brand Plaque</h2>
+      <p class="section-desc">High-resolution executive scenes featuring the official CareerLineSolutions brand plaque mounted on office walls and branded badges on every photo.</p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px; margin-bottom: 50px;">
+        
+        <!-- Showcase 1: Team Discussion -->
+        <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; box-shadow: var(--shadow);">
+          <div style="position: relative; height: 260px; overflow: hidden;">
+            <img src="images/showcase-02-team-discussion.jpg" alt="Team Strategy Discussion" style="width: 100%; height: 100%; object-fit: cover;">
+            <span style="position: absolute; top: 14px; left: 14px; background: #0E4294; color: #FFF; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">STRATEGIC RECRUITMENT</span>
+          </div>
+          <div style="padding: 20px;">
+            <h3 style="font-size: 18px; font-weight: 800; color: var(--primary); margin-bottom: 6px;">Team Strategy Discussion</h3>
+            <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 14px;">Specialist recruitment panel reviewing hiring profiles with official CareerLineSolutions wall branding plaque.</p>
+            <a href="images/showcase-02-team-discussion.jpg" target="_blank" class="asset-btn"><i class="fas fa-external-link-alt"></i> View Full Resolution (1600x1067)</a>
+          </div>
+        </div>
+
+        <!-- Showcase 2: Boardroom Consultation -->
+        <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; box-shadow: var(--shadow);">
+          <div style="position: relative; height: 260px; overflow: hidden;">
+            <img src="images/showcase-01-boardroom-discussion.jpg" alt="Executive Boardroom" style="width: 100%; height: 100%; object-fit: cover;">
+            <span style="position: absolute; top: 14px; left: 14px; background: #E59123; color: #FFF; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">BOARDROOM CONSULTATION</span>
+          </div>
+          <div style="padding: 20px;">
+            <h3 style="font-size: 18px; font-weight: 800; color: var(--primary); margin-bottom: 6px;">Boardroom Talent Meeting</h3>
+            <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 14px;">Executive search and CXO consultation in corporate glass boardroom featuring official logo acrylic wall sign.</p>
+            <a href="images/showcase-01-boardroom-discussion.jpg" target="_blank" class="asset-btn"><i class="fas fa-external-link-alt"></i> View Full Resolution (1600x1067)</a>
+          </div>
+        </div>
+
+        <!-- Showcase 3: Office Collaboration -->
+        <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; box-shadow: var(--shadow);">
+          <div style="position: relative; height: 260px; overflow: hidden;">
+            <img src="images/showcase-03-office-collaboration.jpg" alt="Office Collaboration" style="width: 100%; height: 100%; object-fit: cover;">
+            <span style="position: absolute; top: 14px; left: 14px; background: #10B981; color: #FFF; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">TALENT COLLABORATION</span>
+          </div>
+          <div style="padding: 20px;">
+            <h3 style="font-size: 18px; font-weight: 800; color: var(--primary); margin-bottom: 6px;">Collaborative Talent Advisory</h3>
+            <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 14px;">Modern bright office workspace with recruitment teams executing rapid turnarounds with official brand sign.</p>
+            <a href="images/showcase-03-office-collaboration.jpg" target="_blank" class="asset-btn"><i class="fas fa-external-link-alt"></i> View Full Resolution (1600x900)</a>
+          </div>
+        </div>
+
+        <!-- Showcase 4: Executive Interview -->
+        <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; box-shadow: var(--shadow);">
+          <div style="position: relative; height: 260px; overflow: hidden;">
+            <img src="images/showcase-04-executive-consultation.jpg" alt="Executive Consultation" style="width: 100%; height: 100%; object-fit: cover;">
+            <span style="position: absolute; top: 14px; left: 14px; background: #8B5CF6; color: #FFF; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">CANDIDATE INTERVIEW</span>
+          </div>
+          <div style="padding: 20px;">
+            <h3 style="font-size: 18px; font-weight: 800; color: var(--primary); margin-bottom: 6px;">Executive Interview &amp; Counseling</h3>
+            <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 14px;">In-depth career interview and leadership onboarding session with mounted acrylic hexagon logo plaque backdrop.</p>
+            <a href="images/showcase-04-executive-consultation.jpg" target="_blank" class="asset-btn"><i class="fas fa-external-link-alt"></i> View Full Resolution (1600x2397)</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Brand Color Palette -->
+    <div id="colors">
+      <h2 class="section-title"><i class="fas fa-palette"></i> Official Brand Color Palette</h2>
+      <p class="section-desc">Carefully calibrated corporate colors symbolizing trust, authority, and energetic career progression.</p>
+
+      <div class="color-swatches">
+        <div class="swatch">
+          <div class="swatch-color" style="background: #0E4294;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Royal Blue (Primary)</div>
+            <div class="swatch-hex">#0E4294 • RGB(14, 66, 148)</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #071E47;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Midnight Navy (Dark)</div>
+            <div class="swatch-hex">#071E47 • RGB(7, 30, 71)</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #E59123;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Golden Amber (Accent)</div>
+            <div class="swatch-hex">#E59123 • RGB(229, 145, 35)</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #F59E0B;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Luminous Gold</div>
+            <div class="swatch-hex">#F59E0B • RGB(245, 158, 11)</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <div class="swatch-color" style="background: #FFFFFF; border-bottom: 1px solid #E2E8F0;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Pure White</div>
+            <div class="swatch-hex">#FFFFFF • RGB(255, 255, 255)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Web Integration Guide -->
+    <div class="code-box">
+      <h3><i class="fas fa-code"></i> Official Website Integration</h3>
+      <p>The official approved logo is active across all header navigation bars, mobile slide-out drawers, dark footers, and browser favicons:</p>
+      <pre>&lt;!-- 1. Light Navbar Header Logo --&gt;
+&lt;a href="index.html" class="brand-logo"&gt;
+  &lt;img src="assets/company_logos/careerline-logo-primary.svg" alt="CareerLineSolutions" height="46"&gt;
+&lt;/a&gt;
+
+&lt;!-- 2. Dark Footer Logo --&gt;
+&lt;img src="assets/company_logos/careerline-logo-dark.svg" alt="CareerLineSolutions" height="46"&gt;
+
+&lt;!-- 3. Master Card / App Icon --&gt;
+&lt;img src="assets/company_logos/careerline-logo-card.png" alt="CareerLineSolutions"&gt;</pre>
+    </div>
+
+  </div>
+
+  <script>
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      localStorage.setItem('cls_preview_dark', isDark ? '1' : '0');
+    }
+
+    if (localStorage.getItem('cls_preview_dark') === '1') {
+      document.body.classList.add('dark-mode');
+    }
+  </script>
+</body>
+</html>
