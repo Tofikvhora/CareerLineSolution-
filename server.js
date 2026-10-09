@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { readData, writeData } = require('./database/db');
+const { isR2Configured, uploadResumeToR2 } = require('./services/r2Storage');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -373,7 +374,7 @@ app.get('/api/job-meta', (req, res) => {
 
 // 5. Submit Candidate Job Application (Protected with rate limiting, anti-bot, magic byte checks)
 app.post('/api/apply', applyLimiter, (req, res) => {
-  upload.single('resume')(req, res, (uploadErr) => {
+  upload.single('resume')(req, res, async (uploadErr) => {
     if (uploadErr) {
       if (uploadErr instanceof multer.MulterError) {
         if (uploadErr.code === 'LIMIT_FILE_SIZE') {
@@ -430,6 +431,20 @@ app.post('/api/apply', applyLimiter, (req, res) => {
       const data = readData();
       const job = (data.jobs || []).find(j => j.id === jobId) || { title: 'General Application' };
 
+      // 3. Cloud Storage Upload (Cloudflare R2 with local disk fallback)
+      let resumeUrl = req.file ? `/uploads/resumes/${req.file.filename}` : '';
+      if (req.file && isR2Configured) {
+        try {
+          const r2Url = await uploadResumeToR2(req.file.path, req.file.filename, req.file.mimetype);
+          if (r2Url) {
+            resumeUrl = r2Url;
+            console.log(`[STORAGE] Resume uploaded to Cloudflare R2: ${r2Url}`);
+          }
+        } catch (r2Err) {
+          console.error('[STORAGE] Error uploading to Cloudflare R2, falling back to local file:', r2Err.message);
+        }
+      }
+
       const newApplication = {
         id: 'app_' + Date.now(),
         jobId: jobId || 'general',
@@ -445,7 +460,7 @@ app.post('/api/apply', applyLimiter, (req, res) => {
         skills: skills || '',
         coverNote: coverNote || '',
         resumeFileName: req.file ? req.file.originalname : '',
-        resumeUrl: req.file ? `/uploads/resumes/${req.file.filename}` : '',
+        resumeUrl,
         status: 'New',
         recruiterNotes: 'Application received via portal',
         createdAt: new Date().toISOString()
