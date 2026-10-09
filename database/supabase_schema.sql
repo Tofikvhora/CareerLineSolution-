@@ -115,3 +115,16 @@ CREATE INDEX IF NOT EXISTS idx_cls_jobs_city ON cls_jobs(city);
 CREATE INDEX IF NOT EXISTS idx_cls_apps_job_id ON cls_applications(job_id);
 CREATE INDEX IF NOT EXISTS idx_cls_apps_status ON cls_applications(status);
 CREATE INDEX IF NOT EXISTS idx_cls_apps_created_at ON cls_applications(created_at DESC);
+
+-- Seed Initial Super Admin User (Password: TofikVora@2002)
+INSERT INTO cls_users (id, name, email, password, role, phone)
+VALUES (
+  'usr_admin',
+  'Super Admin',
+  'admin@careerlinesolution.com',
+  '$2b$10$YIs8FM4qHBv1PY7rgV.lPe2A6KjqqjDAIZ7RxquQEXfT9LXLBp8F2',
+  'Admin',
+  '+91 7573905399'
+)
+ON CONFLICT (id) DO UPDATE 
+SET password = EXCLUDED.password;
