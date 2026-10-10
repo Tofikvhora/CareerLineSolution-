@@ -1,2 +1,0 @@
-# Cloudflare Pages / CDN API Proxy to Render Backend
-/api/*  https://careerlinesolutions.onrender.com/api/:splat  200
