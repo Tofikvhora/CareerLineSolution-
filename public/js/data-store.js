@@ -8,6 +8,7 @@
   const isStaticHost = window.location.protocol === 'file:' || 
                        window.location.hostname.endsWith('github.io') ||
                        window.location.hostname.endsWith('pages.dev') ||
+                       window.location.hostname.endsWith('workers.dev') ||
                        window.location.hostname.endsWith('vercel.app') ||
                        window.location.hostname.endsWith('netlify.app') ||
                        (window.location.hostname === 'localhost' && window.location.port === '') ||
@@ -230,16 +231,27 @@
       return origFetch(url, options);
     }
 
-    // Try normal fetch first if not on static host
-    if (!isStaticHost) {
+    // Always attempt live fetch to backend / Cloudflare proxy first:
+    try {
+      const response = await origFetch(url, options);
+      if (response.ok || response.status === 401 || response.status === 400 || response.status === 403 || response.status === 409) {
+        return response;
+      }
+    } catch (err) {
+      // Relative fetch failed, continue to fallback
+    }
+
+    // If on static host (Cloudflare / GitHub Pages), try direct Render backend
+    if (isStaticHost && !urlStr.startsWith('http://') && !urlStr.startsWith('https://')) {
       try {
-        const response = await origFetch(url, options);
-        if (response.ok || response.status === 401 || response.status === 400) {
-          return response;
+        const renderOrigin = 'https://careerlinesolutions.onrender.com';
+        const directUrl = `${renderOrigin}${urlStr.startsWith('/') ? '' : '/'}${urlStr}`;
+        const directResp = await origFetch(directUrl, options);
+        if (directResp.ok || directResp.status === 401 || directResp.status === 400 || directResp.status === 403 || directResp.status === 409) {
+          return directResp;
         }
-      } catch (err) {
-        // Fallback to client-side localStorage store
-        console.warn('Backend unavailable, using client-side localStorage fallback for:', urlStr);
+      } catch (directErr) {
+        console.warn('Render backend currently unavailable, using client-side fallback for:', urlStr);
       }
     }
 
