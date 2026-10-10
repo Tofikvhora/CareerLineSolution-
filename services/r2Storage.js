@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
 const fs = require('fs');
 const path = require('path');
 
@@ -110,8 +110,27 @@ async function deleteResumeFromR2(resumeUrl) {
   }
 }
 
+/**
+ * Get resume object stream from R2 as fallback proxy
+ */
+async function getResumeStreamFromR2(filename) {
+  if (!isR2Configured || !s3Client || !filename) return null;
+  try {
+    const key = filename.startsWith('resumes/') ? filename : `resumes/${filename}`;
+    const response = await s3Client.send(new GetObjectCommand({
+      Bucket: R2_BUCKET_NAME,
+      Key: key
+    }));
+    return response;
+  } catch (err) {
+    console.warn('[STORAGE] Failed to retrieve resume from R2:', err.message);
+    return null;
+  }
+}
+
 module.exports = {
   isR2Configured,
   uploadResumeToR2,
-  deleteResumeFromR2
+  deleteResumeFromR2,
+  getResumeStreamFromR2
 };

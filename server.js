@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const db = require('./services/supabaseDb');
-const { isR2Configured, uploadResumeToR2, deleteResumeFromR2 } = require('./services/r2Storage');
+const { isR2Configured, uploadResumeToR2, deleteResumeFromR2, getResumeStreamFromR2 } = require('./services/r2Storage');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -214,6 +214,28 @@ function sanitizeInput(val) {
 
 // Serve static frontend files
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Stream resume from Cloudflare R2 if not found on local disk
+app.get('/uploads/resumes/:filename', async (req, res, next) => {
+  const localFile = path.join(uploadDir, req.params.filename);
+  if (fs.existsSync(localFile)) {
+    return next();
+  }
+  if (isR2Configured) {
+    try {
+      const obj = await getResumeStreamFromR2(req.params.filename);
+      if (obj && obj.Body) {
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        res.setHeader('Content-Security-Policy', "default-src 'none'");
+        if (obj.ContentType) res.setHeader('Content-Type', obj.ContentType);
+        return obj.Body.pipe(res);
+      }
+    } catch (err) {
+      console.warn('[STORAGE] Error streaming resume from R2:', err.message);
+    }
+  }
+  next();
+});
 
 // Secure static uploads serving (strictly prevents browser script execution)
 app.use('/uploads', (req, res, next) => {
