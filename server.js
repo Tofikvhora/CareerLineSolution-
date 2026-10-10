@@ -1024,13 +1024,16 @@ app.put('/api/admin/settings', authenticateAdmin, async (req, res) => {
   }
 });
 
+// Health check for Render / Cloud monitors
+app.get('/healthz', (req, res) => res.status(200).send('OK'));
+
 // 404 handler for API
 app.use('/api', (req, res) => {
   res.status(404).json({ success: false, message: 'API route not found' });
 });
 
-// Start Server
-app.listen(PORT, () => {
+// Start Server (Explicitly bind to 0.0.0.0 for Render, Docker, and Cloud Containers)
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`====================================================`);
   console.log(`  CareerLineSolution Portal is running on port ${PORT}`);
   console.log(`  Website: http://localhost:${PORT}`);
