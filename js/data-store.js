@@ -7,7 +7,10 @@
 (function () {
   const isStaticHost = window.location.protocol === 'file:' || 
                        window.location.hostname.endsWith('github.io') ||
-                       window.location.hostname === 'localhost' && window.location.port === '' ||
+                       window.location.hostname.endsWith('pages.dev') ||
+                       window.location.hostname.endsWith('vercel.app') ||
+                       window.location.hostname.endsWith('netlify.app') ||
+                       (window.location.hostname === 'localhost' && window.location.port === '') ||
                        window.location.search.includes('mock=true');
 
   const INITIAL_SEED = {
