@@ -1,0 +1,2 @@
+# Cloudflare Routing Rules
+/healthz  https://careerlinesolutions.onrender.com/healthz  302
