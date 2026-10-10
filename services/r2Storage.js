@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const fs = require('fs');
 const path = require('path');
@@ -22,9 +23,14 @@ if (isR2Configured) {
         secretAccessKey: R2_SECRET_ACCESS_KEY
       }
     });
-    console.log(`[STORAGE] Cloudflare R2 configured. Bucket: "${R2_BUCKET_NAME}"`);
+    console.log(`✅ [STORAGE] Cloudflare R2 S3 Client connected. Bucket: "${R2_BUCKET_NAME}"`);
+    if (R2_PUBLIC_URL) {
+      console.log(`✅ [STORAGE] Cloudflare R2 Public Domain: ${R2_PUBLIC_URL}`);
+    } else {
+      console.warn('⚠️ [STORAGE] R2_PUBLIC_URL not set! Resumes will upload to R2, but public browser links need R2_PUBLIC_URL (e.g. https://pub-xxxx.r2.dev).');
+    }
   } catch (err) {
-    console.error('[STORAGE] Error initializing Cloudflare R2 client:', err.message);
+    console.error('❌ [STORAGE] Error initializing Cloudflare R2 client:', err.message);
   }
 } else {
   console.log('[STORAGE] Cloudflare R2 credentials not set. Falling back to local disk storage (/uploads/resumes/).');
@@ -63,10 +69,14 @@ async function uploadResumeToR2(localFilePath, filename, mimeType) {
 
   // Construct viewable link
   if (R2_PUBLIC_URL) {
-    const cleanBase = R2_PUBLIC_URL.replace(/\/$/, '');
+    let cleanBase = R2_PUBLIC_URL.trim().replace(/\/$/, '');
+    if (!cleanBase.startsWith('http://') && !cleanBase.startsWith('https://')) {
+      cleanBase = `https://${cleanBase}`;
+    }
     return `${cleanBase}/${key}`;
   }
 
+  // Fallback direct endpoint
   return `https://${R2_BUCKET_NAME}.${R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${key}`;
 }
 

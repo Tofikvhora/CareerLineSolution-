@@ -8,6 +8,7 @@
   const isStaticHost = window.location.protocol === 'file:' || 
                        window.location.hostname.endsWith('github.io') ||
                        window.location.hostname.endsWith('pages.dev') ||
+                       window.location.hostname.endsWith('workers.dev') ||
                        window.location.hostname.endsWith('vercel.app') ||
                        window.location.hostname.endsWith('netlify.app') ||
                        (window.location.hostname === 'localhost' && window.location.port === '') ||

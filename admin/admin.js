@@ -88,6 +88,11 @@ function resolveResumeUrl(url) {
     if (window.location.protocol === 'file:' || (window.location.port !== '5000' && window.location.port !== '')) {
       return `http://localhost:5000${url}`;
     }
+    // If running on Cloudflare Workers / Pages / GitHub Pages
+    if (window.location.hostname.endsWith('workers.dev') || window.location.hostname.endsWith('pages.dev') || window.location.hostname.endsWith('github.io')) {
+      const backendUrl = localStorage.getItem('cls_backend_url') || 'https://careerlinesolution.onrender.com';
+      return `${backendUrl.replace(/\/$/, '')}${url}`;
+    }
   }
   return url;
 }
@@ -126,10 +131,12 @@ window.downloadCandidateResume = function(appId) {
     }
   }
 
-  // Real URL
+  // Real URL (Cloudflare R2, Render server)
+  const fullUrl = resolveResumeUrl(app.resumeUrl);
   const a = document.createElement('a');
-  a.href = resolveResumeUrl(app.resumeUrl);
+  a.href = fullUrl;
   a.target = '_blank';
+  a.rel = 'noopener noreferrer';
   a.download = filename;
   document.body.appendChild(a);
   a.click();
