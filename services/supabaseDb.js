@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 const { readData, writeData } = require('../database/db');
 
@@ -17,12 +18,30 @@ if (isSupabaseConfigured) {
       }
     });
     console.log('[DATABASE] Supabase PostgreSQL Client initialized.');
+
+    // Async self-check to verify table access & credentials
+    supabase.from('cls_jobs').select('count', { count: 'exact', head: true })
+      .then(({ count, error }) => {
+        if (error) {
+          console.error('❌ [DATABASE] Supabase connection test FAILED:', error.message);
+          if (error.message.includes('cls_jobs') || error.code === '42P01') {
+            console.error('👉 Tip: Table "cls_jobs" not found! Run "database/supabase_schema.sql" in your Supabase SQL Editor.');
+          } else {
+            console.error('👉 Tip: Check your SUPABASE_KEY permissions or service_role key.');
+          }
+        } else {
+          console.log(`✅ [DATABASE] Supabase live connection verified! (${count ?? 0} jobs found in cls_jobs).`);
+        }
+      })
+      .catch(err => {
+        console.error('❌ [DATABASE] Supabase network check failed:', err.message);
+      });
   } catch (err) {
     console.error('[DATABASE] Failed to initialize Supabase client:', err.message);
     supabase = null;
   }
 } else {
-  console.log('[DATABASE] Supabase credentials not found. Using local JSON storage (database/data.json).');
+  console.log('[DATABASE] Supabase credentials not found (SUPABASE_URL / SUPABASE_KEY missing). Using local JSON storage (database/data.json).');
 }
 
 // -------------------------------------------------------------
@@ -353,12 +372,17 @@ async function createJob(jobData) {
     try {
       const row = jobToRow(jobData);
       const { data, error } = await supabase.from('cls_jobs').insert([row]).select().single();
-      if (!error && data) {
+      if (error) {
+        console.error('❌ [DATABASE] Supabase insert job failed:', error.message, error.details || '', error.hint || '');
+      } else if (data) {
+        console.log(`✅ [DATABASE] Job "${jobData.title}" created in Supabase (id: ${data.id})`);
         return rowToJob(data);
       }
     } catch (e) {
-      console.error('[DATABASE] createJob Supabase error, falling back to local:', e.message);
+      console.error('[DATABASE] createJob Supabase exception, falling back to local:', e.message);
     }
+  } else {
+    console.warn('[DATABASE] Supabase is NOT active. Storing job in local database/data.json.');
   }
   const local = readData();
   if (!local.jobs) local.jobs = [];
@@ -375,11 +399,13 @@ async function updateJob(id, updates) {
       const merged = { ...existing, ...updates, id: existing.id, createdAt: existing.createdAt };
       const row = jobToRow(merged);
       const { data, error } = await supabase.from('cls_jobs').update(row).eq('id', id).select().single();
-      if (!error && data) {
+      if (error) {
+        console.error('❌ [DATABASE] Supabase update job failed:', error.message);
+      } else if (data) {
         return rowToJob(data);
       }
     } catch (e) {
-      console.error('[DATABASE] updateJob Supabase error, falling back to local:', e.message);
+      console.error('[DATABASE] updateJob Supabase exception, falling back to local:', e.message);
     }
   }
   const local = readData();
@@ -409,9 +435,13 @@ async function deleteJob(id) {
   if (supabase) {
     try {
       const { error } = await supabase.from('cls_jobs').delete().eq('id', id);
-      if (!error) return true;
+      if (error) {
+        console.error('❌ [DATABASE] Supabase delete job failed:', error.message);
+      } else {
+        return true;
+      }
     } catch (e) {
-      console.error('[DATABASE] deleteJob Supabase error, falling back to local:', e.message);
+      console.error('[DATABASE] deleteJob Supabase exception, falling back to local:', e.message);
     }
   }
   const local = readData();
@@ -458,12 +488,17 @@ async function createApplication(appData) {
     try {
       const row = appToRow(appData);
       const { data, error } = await supabase.from('cls_applications').insert([row]).select().single();
-      if (!error && data) {
+      if (error) {
+        console.error('❌ [DATABASE] Supabase createApplication failed:', error.message, error.details || '', error.hint || '');
+      } else if (data) {
+        console.log(`✅ [DATABASE] Application created in Supabase for ${appData.fullName} (id: ${data.id})`);
         return rowToApp(data);
       }
     } catch (e) {
-      console.error('[DATABASE] createApplication Supabase error, falling back to local:', e.message);
+      console.error('[DATABASE] createApplication Supabase exception, falling back to local:', e.message);
     }
+  } else {
+    console.warn('[DATABASE] Supabase is NOT active. Storing application in local data.json.');
   }
   const local = readData();
   if (!local.applications) local.applications = [];
@@ -479,11 +514,13 @@ async function updateApplication(id, updates) {
       if (updates.status !== undefined) patch.status = updates.status;
       if (updates.recruiterNotes !== undefined) patch.recruiter_notes = updates.recruiterNotes;
       const { data, error } = await supabase.from('cls_applications').update(patch).eq('id', id).select().single();
-      if (!error && data) {
+      if (error) {
+        console.error('❌ [DATABASE] Supabase updateApplication failed:', error.message);
+      } else if (data) {
         return rowToApp(data);
       }
     } catch (e) {
-      console.error('[DATABASE] updateApplication Supabase error, falling back to local:', e.message);
+      console.error('[DATABASE] updateApplication Supabase exception, falling back to local:', e.message);
     }
   }
   const local = readData();
@@ -499,9 +536,13 @@ async function deleteApplication(id) {
   if (supabase) {
     try {
       const { error } = await supabase.from('cls_applications').delete().eq('id', id);
-      if (!error) return true;
+      if (error) {
+        console.error('❌ [DATABASE] Supabase deleteApplication failed:', error.message);
+      } else {
+        return true;
+      }
     } catch (e) {
-      console.error('[DATABASE] deleteApplication Supabase error, falling back to local:', e.message);
+      console.error('[DATABASE] deleteApplication Supabase exception, falling back to local:', e.message);
     }
   }
   const local = readData();
@@ -533,12 +574,16 @@ async function createEmployerRequest(reqData) {
     try {
       const row = reqToRow(reqData);
       const { data, error } = await supabase.from('cls_employer_requests').insert([row]).select().single();
-      if (!error && data) {
+      if (error) {
+        console.error('❌ [DATABASE] Supabase createEmployerRequest failed:', error.message, error.details || '');
+      } else if (data) {
         return rowToReq(data);
       }
     } catch (e) {
-      console.error('[DATABASE] createEmployerRequest Supabase error, falling back to local:', e.message);
+      console.error('[DATABASE] createEmployerRequest Supabase exception, falling back to local:', e.message);
     }
+  } else {
+    console.warn('[DATABASE] Supabase is NOT active. Storing employer request in local data.json.');
   }
   const local = readData();
   if (!local.employerRequests) local.employerRequests = [];
@@ -554,11 +599,13 @@ async function updateEmployerRequest(id, updates) {
       if (updates.status !== undefined) patch.status = updates.status;
       if (updates.notes !== undefined) patch.notes = updates.notes;
       const { data, error } = await supabase.from('cls_employer_requests').update(patch).eq('id', id).select().single();
-      if (!error && data) {
+      if (error) {
+        console.error('❌ [DATABASE] Supabase updateEmployerRequest failed:', error.message);
+      } else if (data) {
         return rowToReq(data);
       }
     } catch (e) {
-      console.error('[DATABASE] updateEmployerRequest Supabase error, falling back to local:', e.message);
+      console.error('[DATABASE] updateEmployerRequest Supabase exception, falling back to local:', e.message);
     }
   }
   const local = readData();
@@ -574,9 +621,13 @@ async function deleteEmployerRequest(id) {
   if (supabase) {
     try {
       const { error } = await supabase.from('cls_employer_requests').delete().eq('id', id);
-      if (!error) return true;
+      if (error) {
+        console.error('❌ [DATABASE] Supabase deleteEmployerRequest failed:', error.message);
+      } else {
+        return true;
+      }
     } catch (e) {
-      console.error('[DATABASE] deleteEmployerRequest Supabase error, falling back to local:', e.message);
+      console.error('[DATABASE] deleteEmployerRequest Supabase exception, falling back to local:', e.message);
     }
   }
   const local = readData();
@@ -608,12 +659,16 @@ async function createInquiry(inqData) {
     try {
       const row = inqToRow(inqData);
       const { data, error } = await supabase.from('cls_inquiries').insert([row]).select().single();
-      if (!error && data) {
+      if (error) {
+        console.error('❌ [DATABASE] Supabase createInquiry failed:', error.message, error.details || '');
+      } else if (data) {
         return rowToInq(data);
       }
     } catch (e) {
-      console.error('[DATABASE] createInquiry Supabase error, falling back to local:', e.message);
+      console.error('[DATABASE] createInquiry Supabase exception, falling back to local:', e.message);
     }
+  } else {
+    console.warn('[DATABASE] Supabase is NOT active. Storing inquiry in local data.json.');
   }
   const local = readData();
   if (!local.inquiries) local.inquiries = [];
@@ -628,11 +683,13 @@ async function updateInquiry(id, updates) {
       const patch = {};
       if (updates.status !== undefined) patch.status = updates.status;
       const { data, error } = await supabase.from('cls_inquiries').update(patch).eq('id', id).select().single();
-      if (!error && data) {
+      if (error) {
+        console.error('❌ [DATABASE] Supabase updateInquiry failed:', error.message);
+      } else if (data) {
         return rowToInq(data);
       }
     } catch (e) {
-      console.error('[DATABASE] updateInquiry Supabase error, falling back to local:', e.message);
+      console.error('[DATABASE] updateInquiry Supabase exception, falling back to local:', e.message);
     }
   }
   const local = readData();
@@ -647,9 +704,13 @@ async function deleteInquiry(id) {
   if (supabase) {
     try {
       const { error } = await supabase.from('cls_inquiries').delete().eq('id', id);
-      if (!error) return true;
+      if (error) {
+        console.error('❌ [DATABASE] Supabase deleteInquiry failed:', error.message);
+      } else {
+        return true;
+      }
     } catch (e) {
-      console.error('[DATABASE] deleteInquiry Supabase error, falling back to local:', e.message);
+      console.error('[DATABASE] deleteInquiry Supabase exception, falling back to local:', e.message);
     }
   }
   const local = readData();
@@ -698,12 +759,16 @@ async function createUser(userData) {
     try {
       const row = userToRow(userData);
       const { data, error } = await supabase.from('cls_users').insert([row]).select().single();
-      if (!error && data) {
+      if (error) {
+        console.error('❌ [DATABASE] Supabase createUser failed:', error.message, error.details || '');
+      } else if (data) {
         return rowToUser(data);
       }
     } catch (e) {
-      console.error('[DATABASE] createUser Supabase error, falling back to local:', e.message);
+      console.error('[DATABASE] createUser Supabase exception, falling back to local:', e.message);
     }
+  } else {
+    console.warn('[DATABASE] Supabase is NOT active. Storing user in local data.json.');
   }
   const local = readData();
   if (!local.users) local.users = [];
@@ -716,9 +781,13 @@ async function deleteUser(id) {
   if (supabase) {
     try {
       const { error } = await supabase.from('cls_users').delete().eq('id', id);
-      if (!error) return true;
+      if (error) {
+        console.error('❌ [DATABASE] Supabase deleteUser failed:', error.message);
+      } else {
+        return true;
+      }
     } catch (e) {
-      console.error('[DATABASE] deleteUser Supabase error, falling back to local:', e.message);
+      console.error('[DATABASE] deleteUser Supabase exception, falling back to local:', e.message);
     }
   }
   const local = readData();
