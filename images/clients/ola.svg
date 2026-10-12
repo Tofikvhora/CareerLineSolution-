@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <rect width="200" height="60" rx="8" fill="#FFFFFF"/>
+  <circle cx="35" cy="30" r="16" fill="#000000"/>
+  <!-- Ola green circle accent -->
+  <circle cx="35" cy="30" r="10" fill="#99CC00"/>
+  <circle cx="35" cy="30" r="5" fill="#FFFFFF"/>
+  <text x="62" y="38" font-family="'Inter', -apple-system, sans-serif" font-weight="900" font-size="24" fill="#111111" letter-spacing="1">OLA</text>
+  <text x="63" y="46" font-family="'Inter', -apple-system, sans-serif" font-weight="600" font-size="7" fill="#64748B" letter-spacing="1">CABS &amp; MOBILITY</text>
+</svg>

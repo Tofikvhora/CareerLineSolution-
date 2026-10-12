@@ -2395,3 +2395,226 @@ textarea.form-control {
     font-size: 1.4rem;
   }
 }
+
+/* ==========================================
+   FEATURED CORPORATE CLIENTS & PARTNERS
+   ========================================== */
+.clients-section {
+  padding: 5rem 0;
+  position: relative;
+}
+
+.clients-ticker-wrap {
+  width: 100%;
+  overflow: hidden;
+  padding: 1.5rem 0;
+  background: #FFFFFF;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+}
+
+.clients-ticker-wrap::before,
+.clients-ticker-wrap::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 120px;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.clients-ticker-wrap::before {
+  left: 0;
+  background: linear-gradient(to right, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+.clients-ticker-wrap::after {
+  right: 0;
+  background: linear-gradient(to left, #FFFFFF 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+.clients-ticker-track {
+  display: flex;
+  gap: 2rem;
+  width: max-content;
+  animation: clientMarquee 32s linear infinite;
+}
+
+.clients-ticker-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes clientMarquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1.75rem;
+  min-width: 170px;
+  height: 64px;
+  transition: var(--transition);
+}
+
+.ticker-item img {
+  max-height: 38px;
+  max-width: 140px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: grayscale(85%) opacity(0.85);
+  transition: var(--transition);
+}
+
+.ticker-item:hover {
+  background: #FFFFFF;
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.ticker-item:hover img {
+  filter: grayscale(0%) opacity(1);
+}
+
+/* Detailed Clients Grid */
+.clients-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+@media (max-width: 1100px) {
+  .clients-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .clients-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .clients-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.client-card {
+  background: #FFFFFF;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem 1.5rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.client-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: transparent;
+  transition: var(--transition);
+}
+
+.client-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-xl);
+  border-color: rgba(200, 155, 60, 0.4);
+}
+
+.client-card:hover::after {
+  background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+}
+
+.client-logo-wrap {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-md);
+  height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1.25rem;
+  transition: var(--transition);
+}
+
+.client-card:hover .client-logo-wrap {
+  background: #FFFFFF;
+  border-color: #CBD5E1;
+}
+
+.client-logo-wrap img {
+  max-height: 48px;
+  max-width: 160px;
+  object-fit: contain;
+}
+
+.client-card-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.client-sector-tag {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 999px;
+  background: #EFF6FF;
+  color: var(--primary);
+  margin-bottom: 0.75rem;
+}
+
+.client-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 0.35rem;
+}
+
+.client-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin-bottom: 1rem;
+  flex-grow: 1;
+}
+
+.client-hires {
+  border-top: 1px dashed var(--border-color);
+  padding-top: 0.85rem;
+  font-size: 0.8rem;
+  color: var(--text-dark);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.client-hires i {
+  color: var(--accent);
+}

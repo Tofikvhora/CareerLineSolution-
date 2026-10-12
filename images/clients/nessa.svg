@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <rect width="200" height="60" rx="8" fill="#FFFFFF"/>
+  <circle cx="32" cy="30" r="15" fill="#0284C7"/>
+  <path d="M26 36 L26 24 L38 36 L38 24" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <text x="56" y="34" font-family="'Inter', -apple-system, sans-serif" font-weight="800" font-size="18" fill="#0F172A" letter-spacing="0.5">NESSA</text>
+  <text x="57" y="44" font-family="'Inter', -apple-system, sans-serif" font-weight="600" font-size="8.5" fill="#0284C7" letter-spacing="1">TECHNOLOGY</text>
+</svg>
