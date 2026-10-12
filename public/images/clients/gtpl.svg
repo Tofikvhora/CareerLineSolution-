@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <rect width="200" height="60" rx="8" fill="#FFFFFF"/>
+  <rect x="20" y="16" width="30" height="28" rx="6" fill="#E62325"/>
+  <path d="M28 22 L42 22 L42 27 L33 27 L33 30 L40 30 L40 34 L33 34 L33 40 L28 40 Z" fill="#FFFFFF"/>
+  <text x="58" y="38" font-family="'Inter', -apple-system, sans-serif" font-weight="900" font-size="22" fill="#0F172A" letter-spacing="1">GTPL</text>
+  <text x="59" y="46" font-family="'Inter', -apple-system, sans-serif" font-weight="600" font-size="7" fill="#64748B" letter-spacing="0.5">HATHWAY LIMITED</text>
+</svg>

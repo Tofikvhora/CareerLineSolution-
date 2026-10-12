@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <rect width="200" height="60" rx="8" fill="#FFFFFF"/>
+  <rect x="20" y="14" width="32" height="32" rx="8" fill="#FC8019"/>
+  <!-- Location pin / Spoon icon silhouette in white -->
+  <path d="M36 21 C32 21 29 24 29 28 C29 33 36 40 36 40 C36 40 43 33 43 28 C43 24 40 21 36 21 Z M36 29 C34.9 29 34 28.1 34 27 C34 25.9 34.9 25 36 25 C37.1 25 38 25.9 38 27 C38 28.1 37.1 29 36 29 Z" fill="#FFFFFF"/>
+  <text x="60" y="38" font-family="'Inter', -apple-system, sans-serif" font-weight="900" font-size="22" fill="#FC8019" letter-spacing="-0.5">SWIGGY</text>
+</svg>

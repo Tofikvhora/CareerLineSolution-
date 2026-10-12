@@ -247,6 +247,7 @@ app.use('/uploads', (req, res, next) => {
 // Clean page URL routes
 app.get('/jobs', (req, res) => res.sendFile(path.join(__dirname, 'public', 'jobs.html')));
 app.get('/about', (req, res) => res.sendFile(path.join(__dirname, 'public', 'about.html')));
+app.get('/clients', (req, res) => res.sendFile(path.join(__dirname, 'public', 'clients.html')));
 app.get('/services', (req, res) => res.sendFile(path.join(__dirname, 'public', 'services.html')));
 app.get('/employers', (req, res) => res.sendFile(path.join(__dirname, 'public', 'employers.html')));
 app.get('/contact', (req, res) => res.sendFile(path.join(__dirname, 'public', 'contact.html')));

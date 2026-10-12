@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <rect width="200" height="60" rx="8" fill="#FFFFFF"/>
+  <circle cx="35" cy="30" r="16" fill="#FFDD00"/>
+  <path d="M29 35 L33 23 L39 23 C42 23 44 25 44 28 C44 31 42 33 39 33 L34 33 L33 35 Z M36 29 L38 29 C39.5 29 40.5 28.5 40.5 27.5 C40.5 26.5 39.5 26 38 26 L35.5 26 Z" fill="#222222"/>
+  <text x="62" y="38" font-family="'Inter', -apple-system, sans-serif" font-weight="900" font-size="22" fill="#222222" letter-spacing="0.5">rapido</text>
+</svg>
