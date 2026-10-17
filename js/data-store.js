@@ -244,7 +244,7 @@
     // If on static host (Cloudflare / GitHub Pages), try direct Render backend
     if (isStaticHost && !urlStr.startsWith('http://') && !urlStr.startsWith('https://')) {
       try {
-        const renderOrigin = 'https://careerlinesolutions.onrender.com';
+        const renderOrigin = window.API_BASE_URL || localStorage.getItem('cls_backend_url') || 'https://careerlinesolution.onrender.com';
         const directUrl = `${renderOrigin}${urlStr.startsWith('/') ? '' : '/'}${urlStr}`;
         const directResp = await origFetch(directUrl, options);
         if (directResp.ok || directResp.status === 401 || directResp.status === 400 || directResp.status === 403 || directResp.status === 409) {
