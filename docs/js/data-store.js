@@ -5,17 +5,17 @@
  */
 
 (function () {
-  const isStaticHost = window.location.protocol === 'file:' || 
-                       window.location.hostname.endsWith('github.io') ||
-                       window.location.hostname === 'localhost' && window.location.port === '' ||
-                       window.location.search.includes('mock=true');
+  const LIVE_BACKEND_URL = window.API_BASE_URL || localStorage.getItem('cls_backend_url') || 'https://careerlinesolution.onrender.com';
+  const isBackendHost = window.location.origin.includes('careerlinesolution.onrender.com') ||
+                        (window.location.hostname === 'localhost' && window.location.port === '5000');
+  const isStaticHost = !isBackendHost;
 
   const INITIAL_SEED = {
     users: [
       {
         id: 'usr_admin',
         name: 'Super Admin',
-        email: 'admin@careerlinesolution.com',
+        email: 'admin@careerlinesolutions.com',
         role: 'Admin',
         phone: '+91 7573905399',
         createdAt: new Date().toISOString()
@@ -157,11 +157,11 @@
     ],
     settings: {
       siteName: 'CareerLine Solutions',
-      tagline: 'Tofik vora',
+      tagline: 'TALENT. GROWTH. SUCCESS.',
       phone: '+91 9601874036',
       altPhone: '+91 9601874036',
       whatsapp: '9601874036',
-      email: 'info@careerlinesolution.com',
+      email: 'info@careerlinesolutions.com',
       address: 'Sarkhej Jambu wala No delo Ahmedabad India 382210',
       branchOffice: 'Sarkhej Jambu wala No delo Ahmedabad India 382210',
       panIndiaReach: 'Mumbai, Delhi-NCR, Bengaluru, Hyderabad, Pune, Chennai, Kolkata, Ahmedabad, Surat, Jaipur, Indore, Chandigarh',
@@ -217,7 +217,7 @@
     }
   }
 
-  // Intercept window.fetch for /api/* on static environments
+  // Intercept window.fetch for /api/*
   const origFetch = window.fetch;
   window.fetch = async function (url, options = {}) {
     const urlStr = String(url);
@@ -227,20 +227,28 @@
       return origFetch(url, options);
     }
 
-    // Try normal fetch first if not on static host
-    if (!isStaticHost) {
+    const forceMock = window.location.search.includes('mock=true');
+
+    if (!forceMock) {
+      // Determine the real target URL:
+      // If we are NOT on the backend host and the URL is relative, route it directly to LIVE_BACKEND_URL
+      let targetUrl = urlStr;
+      if (!isBackendHost && !urlStr.startsWith('http://') && !urlStr.startsWith('https://')) {
+        const cleanBase = LIVE_BACKEND_URL.replace(/\/$/, '');
+        const cleanPath = urlStr.startsWith('/') ? urlStr : `/${urlStr}`;
+        targetUrl = `${cleanBase}${cleanPath}`;
+      }
+
       try {
-        const response = await origFetch(url, options);
-        if (response.ok || response.status === 401 || response.status === 400) {
-          return response;
-        }
-      } catch (err) {
-        // Fallback to client-side localStorage store
-        console.warn('Backend unavailable, using client-side localStorage fallback for:', urlStr);
+        const response = await origFetch(targetUrl, options);
+        // Return any real HTTP response received from the server
+        return response;
+      } catch (networkError) {
+        console.warn(`[API] Live backend fetch failed for ${targetUrl}, using offline fallback:`, networkError.message);
       }
     }
 
-    // CLIENT-SIDE MOCK HANDLER
+    // CLIENT-SIDE MOCK HANDLER (offline or mock=true fallback)
     const method = (options.method || 'GET').toUpperCase();
     const db = getDB();
     const urlObj = new URL(urlStr, window.location.origin);
@@ -431,11 +439,11 @@
     if (pathname === '/api/admin/login' && method === 'POST') {
       const body = typeof options.body === 'string' ? JSON.parse(options.body) : {};
       const user = db.users.find(u => u.email.toLowerCase() === (body.email || '').trim().toLowerCase());
-      if (user || body.email === 'admin@careerlinesolution.com') {
+      if (user || body.email === 'admin@careerlinesolutions.com' || body.email === 'admin@careerlinesolution.com') {
         const loggedUser = user || {
           id: 'usr_admin',
-          name: 'Super Admin',
-          email: 'admin@careerlinesolution.com',
+          name: 'Habib (Director)',
+          email: 'admin@careerlinesolutions.com',
           role: 'Admin'
         };
         return mockJson({
@@ -444,14 +452,14 @@
           user: loggedUser
         });
       }
-      return mockJson({ success: false, message: 'Invalid credentials. Hint: admin@careerlinesolution.com / admin123' }, 401);
+      return mockJson({ success: false, message: 'Invalid credentials. Hint: admin@careerlinesolutions.com / HrHabib@2026' }, 401);
     }
 
     // 9. GET /api/admin/me
     if (pathname === '/api/admin/me') {
       return mockJson({
         success: true,
-        user: { id: 'usr_admin', name: 'Super Admin', email: 'admin@careerlinesolution.com', role: 'Admin' }
+        user: { id: 'usr_admin', name: 'Habib (Director)', email: 'admin@careerlinesolutions.com', role: 'Admin' }
       });
     }
 

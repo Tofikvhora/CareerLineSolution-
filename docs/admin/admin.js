@@ -85,8 +85,11 @@ function resolveResumeUrl(url) {
     return url;
   }
   if (url.startsWith('/uploads/')) {
-    if (window.location.protocol === 'file:' || (window.location.port !== '5000' && window.location.port !== '')) {
-      return `http://localhost:5000${url}`;
+    const isBackend = window.location.origin.includes('careerlinesolution.onrender.com') ||
+                      (window.location.hostname === 'localhost' && window.location.port === '5000');
+    if (!isBackend) {
+      const backendUrl = window.API_BASE_URL || localStorage.getItem('cls_backend_url') || 'https://careerlinesolution.onrender.com';
+      return `${backendUrl.replace(/\/$/, '')}${url}`;
     }
   }
   return url;
@@ -126,10 +129,12 @@ window.downloadCandidateResume = function(appId) {
     }
   }
 
-  // Real URL
+  // Real URL (Cloudflare R2, Render server)
+  const fullUrl = resolveResumeUrl(app.resumeUrl);
   const a = document.createElement('a');
-  a.href = resolveResumeUrl(app.resumeUrl);
+  a.href = fullUrl;
   a.target = '_blank';
+  a.rel = 'noopener noreferrer';
   a.download = filename;
   document.body.appendChild(a);
   a.click();
@@ -1060,7 +1065,7 @@ window.exportCandidatesToExcel = function () {
       } else if (app.resumeUrl.startsWith('http://') || app.resumeUrl.startsWith('https://')) {
         resumeDisplay = app.resumeUrl;
       } else {
-        resumeDisplay = window.location.origin + (app.resumeUrl.startsWith('/') ? '' : '/') + app.resumeUrl;
+        resumeDisplay = resolveResumeUrl(app.resumeUrl);
       }
     }
 
