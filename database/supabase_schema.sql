@@ -140,15 +140,89 @@ CREATE INDEX IF NOT EXISTS idx_cls_apps_job_id ON cls_applications(job_id);
 CREATE INDEX IF NOT EXISTS idx_cls_apps_status ON cls_applications(status);
 CREATE INDEX IF NOT EXISTS idx_cls_apps_created_at ON cls_applications(created_at DESC);
 
--- Seed Initial Super Admin User (Password: TofikVora@2002)
+-- Seed Initial Super Admin User (Password: HrHabib@2026)
 INSERT INTO cls_users (id, name, email, password, role, phone)
 VALUES (
   'usr_admin',
-  'Super Admin',
-  'admin@careerlinesolution.com',
-  '$2b$10$YIs8FM4qHBv1PY7rgV.lPe2A6KjqqjDAIZ7RxquQEXfT9LXLBp8F2',
+  'Habib (Director)',
+  'admin@careerlinesolutions.com',
+  '$2b$10$fZiMEfaLs//hxJY2ZsrbiOzS.cKKNUyYXcrzP7jcUVtmT8Qnq8xCO',
   'Admin',
-  '+91 7573905399'
+  '+91 9601874036'
 )
 ON CONFLICT (id) DO UPDATE 
-SET password = EXCLUDED.password;
+SET password = EXCLUDED.password,
+    name = EXCLUDED.name,
+    email = EXCLUDED.email,
+    phone = EXCLUDED.phone;
+
+-- Seed Initial Site Settings
+INSERT INTO cls_settings (id, data)
+VALUES (
+  'site_settings',
+  '{
+    "siteName": "CareerLine Solutions",
+    "tagline": "TALENT. GROWTH. SUCCESS.",
+    "phone": "+91 9601874036",
+    "altPhone": "+91 9601874036",
+    "whatsapp": "9601874036",
+    "email": "info@careerlinesolutions.com",
+    "address": "Sarkhej Jambu wala No delo Ahmedabad India 382210",
+    "branchOffice": "Sarkhej Jambu wala No delo Ahmedabad India 382210",
+    "panIndiaReach": "Mumbai, Delhi-NCR, Bengaluru, Hyderabad, Pune, Chennai, Kolkata, Ahmedabad, Surat, Jaipur, Indore, Chandigarh",
+    "stats": {
+      "placements": "15,000+",
+      "clients": "500+",
+      "database": "1,50,000+",
+      "industries": "25+"
+    }
+  }'::jsonb
+)
+ON CONFLICT (id) DO UPDATE 
+SET data = EXCLUDED.data;
+
+-- Seed Initial Active Jobs
+INSERT INTO cls_jobs (id, title, category, company, location, city, state, job_type, work_mode, experience, experience_range, salary, openings, urgent, featured, status, skills, description)
+VALUES 
+(
+  'job_1791381924591',
+  'Data Entry Specialist',
+  'IT & Software',
+  'Aerosol IO Ltd',
+  'Mumbai',
+  'Mumbai',
+  'Maharashtra',
+  'Full-Time',
+  'On-Site',
+  '1-3 Years',
+  '1-3',
+  '1,50,000 - 2,50,000 PA',
+  3,
+  TRUE,
+  TRUE,
+  'Active',
+  '["Excel DataEntry", "Data Management", "MIS Reporting"]'::jsonb,
+  'Looking for accurate and detail-oriented Data Entry Specialists for fast-growing logistics operations.'
+),
+(
+  'job_1791376766393',
+  'Senior Software Engineer',
+  'IT & Software',
+  'Client Confidential',
+  'Ahmedabad',
+  'Ahmedabad',
+  'Gujarat',
+  'Full-Time',
+  'Hybrid',
+  '3-5 Years',
+  '3-5',
+  '6,00,000 - 12,00,000 PA',
+  2,
+  TRUE,
+  TRUE,
+  'Active',
+  '["JavaScript", "Node.js", "React", "PostgreSQL", "REST APIs"]'::jsonb,
+  'We are hiring an experienced Full-Stack / Backend Engineer to scale enterprise web platforms.'
+)
+ON CONFLICT (id) DO NOTHING;
+
